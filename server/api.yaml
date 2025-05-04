@@ -1,0 +1,574 @@
+openapi: 3.0.0
+info:
+  title: Project Management API
+  version: 1.2.0
+
+tags:
+  - name: Project
+    description: Операции с проектами
+  - name: File
+    description: Операции с файлами
+  - name: User
+    description: Операции с пользователями
+
+paths:
+  /register:
+    post:
+      tags:
+        - User
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewUser'
+      responses:
+        '200':
+          description: Successful registration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /users/{user_id}:
+    get:
+      tags:
+        - User
+      summary: Get user information
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+    put:
+      tags:
+        - User
+      summary: Update a user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: User not found
+
+    delete:
+      tags:
+        - User
+      summary: Delete a user
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User deleted successfully
+        '404':
+          description: User not found
+
+  /projects:
+    post:
+      tags:
+        - Project
+      summary: Create a new project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewProject'
+      responses:
+        '200':
+          description: Project created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+
+  /projects/{project_id}:
+    get:
+      tags:
+        - Project
+      summary: Get project information
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Project details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          description: Project not found
+
+    put:
+      tags:
+        - Project
+      summary: Update a project
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdate'
+      responses:
+        '200':
+          description: Project updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '404':
+          description: Project not found
+
+    delete:
+      tags:
+        - Project
+      summary: Delete a project
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Project deleted successfully
+        '404':
+          description: Project not found
+
+  /files:
+    post:
+      tags:
+        - File
+      summary: Create a new file
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileDto'
+      responses:
+        '200':
+          description: File created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+
+  /files/{file_id}:
+    get:
+      tags:
+        - File
+      summary: Get file information
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: File details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        '404':
+          description: File not found
+
+    put:
+      tags:
+        - File
+      summary: Update a file
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileDto'
+      responses:
+        '200':
+          description: File updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        '404':
+          description: File not found
+
+    delete:
+      tags:
+        - File
+      summary: Delete a file
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: File deleted successfully
+        '404':
+          description: File not found
+
+  /file-types:
+    post:
+      tags:
+        - File
+      summary: Create a new file type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewFileType'
+      responses:
+        '200':
+          description: File type created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileType'
+
+    get:
+      tags:
+        - File
+      summary: Get all file types
+      responses:
+        '200':
+          description: List of file types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FileType'
+
+  /projects/{project_id}/add_file:
+    post:
+      tags:
+        - Project
+      summary: Link a file to a project
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file_id:
+                  type: integer
+              required:
+                - file_id
+
+      responses:
+        '200':
+          description: File linked to project successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  project_id:
+                    type: integer
+                  file_id:
+                    type: integer
+        '404':
+          description: Project or File not found
+
+  /projects/{project_id}/files:
+    get:
+      tags:
+        - Project
+      summary: Get all files for a project
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of files for this project
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/File'
+        '404':
+          description: Project not found
+
+  /projects-users:
+    post:
+      tags:
+        - Project
+        - User
+      summary: Link user to project with role/permission
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUserDto'
+      responses:
+        '200':
+          description: Linked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectUser'
+
+    put:
+      tags:
+        - Project
+        - User
+      summary: Update role/permission for user in project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUserDto'
+      responses:
+        '200':
+          description: Updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectUser'
+
+  /projects-users/user/{user_id}:
+    get:
+      tags:
+        - User
+      summary: Get user's projects
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of ProjectUser
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectUser'
+
+  /projects-users/project/{project_id}:
+    get:
+      tags:
+        - Project
+      summary: Get users of project
+      parameters:
+        - name: project_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of ProjectUser
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectUser'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        surname:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+        photo:
+          type: string
+
+    NewUser:
+      type: object
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+        photo:
+          type: string
+
+    UserUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        surname:
+          type: string
+        photo:
+          type: string
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: integer
+        author:
+          type: integer
+        date:
+          type: string
+          format: date
+        name:
+          type: string
+
+    NewProject:
+      type: object
+      properties:
+        author:
+          type: integer
+        date:
+          type: string
+          format: date
+        name:
+          type: string
+
+    ProjectUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+
+    FileType:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    NewFileType:
+      type: object
+      properties:
+        name:
+          type: string
+
+    File:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/FileType'
+        author:
+          type: integer
+        date:
+          type: string
+          format: date
+
+    FileDto:
+      type: object
+      properties:
+        name:
+          type: string
+        typeId:
+          type: integer
+        author:
+          type: integer
+        date:
+          type: string
+          format: date
+
+    ProjectUserDto:
+      type: object
+      properties:
+        projectId:
+          type: integer
+        userId:
+          type: integer
+        role:
+          type: string
+        permission:
+          type: string
+
+    ProjectUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        project:
+          $ref: '#/components/schemas/Project'
+        user:
+          $ref: '#/components/schemas/User'
+        role:
+          type: string
+        permission:
+          type: string
