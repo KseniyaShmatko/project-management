@@ -21,31 +21,30 @@
 ### 1. Клонирование репозитория
 
 ```bash
-git clone <url-репозитория>
+git clone https://github.com/KseniyaShmatko/project-management.git
 cd project-management
 ```
 
 ### 2. Установка зависимостей
 
 **PostgreSQL**
-1. Установи PostgreSQL (если ещё нет).
-2. Создай БД и пользователя:
-
+1. Установите PostgreSQL (если ещё нет).
+2. Создайте БД и пользователя:
 ```bash
 psql -U postgres
 ```
-В консоли psql введи:
 
+В консоли psql введите:
 ```sql
 CREATE DATABASE project_db;
 CREATE USER project_user WITH ENCRYPTED PASSWORD 'project_pass';
 GRANT ALL PRIVILEGES ON DATABASE project_db TO project_user;
 ```
+
 **MongoDB**
 
-1. Установи MongoDB
-2. Запусти службу (macOS):
-
+1. Установите MongoDB
+2. Запустите службу (macOS):
 ```bash
 brew services start mongodb-community
 ```
@@ -62,11 +61,11 @@ spring.datasource.url=jdbc:postgresql://localhost:5432/project_db
 spring.datasource.username=project_user
 spring.datasource.password=project_pass
 ```
-При необходимости поменяй параметры подключения под свою среду.
+При необходимости поменяйте параметры подключения под свою среду.
 
 ### 4. Сборка и запуск
 
-В корне проекта выполни:
+В корне проекта выполните:
 ```bash
 ./gradlew clean build
 ./gradlew bootRun
@@ -88,4 +87,4 @@ spring.datasource.password=project_pass
   - /styles-maps — карта применения стилей
   - /projects, /users, /files — проекты, пользователи, файл (PostgreSQL)
 
-- Описание ручек смотри в OpenAPI/Swagger-спецификации или в папке controllers.
+- Описание ручек смотрите в OpenAPI/Swagger-спецификации или в папке controllers.

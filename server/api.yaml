@@ -10,6 +10,14 @@ tags:
     description: Операции с файлами
   - name: User
     description: Операции с пользователями
+  - name: Super-object
+    description: Операции с суперобъектом
+  - name: Content-block
+    description: Операции с блоками данных
+  - name: Style
+    description: Операции со стилями
+  - name: StylesMap
+    description: Операции с картой стилей
 
 paths:
   /register:
@@ -433,6 +441,326 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProjectUser'
 
+  /super-objects:
+    post:
+      tags:
+        - Super-object
+      summary: Create SuperObject (контент по файлу)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuperObject'
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperObject'
+
+  /super-objects/by-file/{fileId}:
+    get:
+      tags:
+        - Super-object
+      summary: Get SuperObject by fileId
+      parameters:
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Content super object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperObject'
+        '404':
+          description: Not found
+
+  /super-objects/{id}:
+    get:
+      tags:
+        - Super-object
+      summary: Get SuperObject by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Content super object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperObject'
+        '404':
+          description: Not found
+    put:
+      tags:
+        - Super-object
+      summary: Update SuperObject
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuperObject'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuperObject'
+    delete:
+      tags:
+        - Super-object
+      summary: Delete SuperObject
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+
+  /content-blocks:
+    post:
+      tags:
+        - Content-block
+      summary: Create ContentBlock
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentBlock'
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentBlock'
+
+  /content-blocks/{id}:
+    get:
+      tags:
+        - Content-block
+      summary: Get ContentBlock by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ContentBlock
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentBlock'
+    put:
+      tags:
+        - Content-block
+      summary: Update ContentBlock
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentBlock'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentBlock'
+    delete:
+      tags:
+        - Content-block
+      summary: Delete ContentBlock
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+
+  /styles:
+    post:
+      tags:
+        - Style
+      summary: Create Style
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Style'
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Style'
+
+  /styles/{id}:
+    get:
+      tags:
+        - Style
+      summary: Get Style by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Style
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Style'
+    put:
+      tags:
+        - Style
+      summary: Update Style
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Style'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Style'
+    delete:
+      tags:
+        - Style
+      summary: Delete Style
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+
+  /styles-maps:
+    post:
+      tags:
+        - StylesMap
+      summary: Create StylesMap
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StylesMap'
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StylesMap'
+
+  /styles-maps/{id}:
+    get:
+      tags:
+        - StylesMap
+      summary: Get StylesMap by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: StylesMap
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StylesMap'
+    put:
+      tags:
+        - StylesMap
+      summary: Update StylesMap
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StylesMap'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StylesMap'
+    delete:
+      tags:
+        - StylesMap
+      summary: Delete StylesMap
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+
+
 components:
   schemas:
     User:
@@ -572,3 +900,135 @@ components:
           type: string
         permission:
           type: string
+
+    SuperObject:
+      type: object
+      properties:
+        id:
+          type: string
+        fileId:
+          type: integer
+        serviceType:
+          type: string
+        lastChangeDate:
+          type: string
+        name:
+          type: string
+        template:
+          $ref: '#/components/schemas/Template'
+        decoration:
+          $ref: '#/components/schemas/Decoration'
+        firstItem:
+          type: string
+        lastItem:
+          type: string
+        checkSum:
+          type: integer
+        stylesMapId:
+          type: string
+
+    Template:
+      type: object
+      properties:
+        image:
+          type: string
+        type:
+          type: string
+        color:
+          type: string
+
+    Decoration:
+      type: object
+      properties:
+        marginTop:
+          type: integer
+        marginRight:
+          type: integer
+        marginLeft:
+          type: integer
+        marginBottom:
+          type: integer
+
+    ContentBlock:
+      type: object
+      properties:
+        id:
+          type: string
+        objectType:
+          type: string
+        nextItem:
+          type: string
+        prevItem:
+          type: string
+        data:
+          type: string
+        label:
+          type: string
+        items:
+          type: array
+          items:
+            type: string
+        marker:
+          type: string
+        position:
+          type: string
+
+    Style:
+      type: object
+      properties:
+        id:
+          type: string
+        objectType:
+          type: string
+        appliedObject:
+          type: string
+        alignment:
+          type: string
+        color:
+          type: string
+        fontFamily:
+          type: string
+        fontSize:
+          type: integer
+        marginTop:
+          type: integer
+        marginRight:
+          type: integer
+        marginLeft:
+          type: integer
+        marginBottom:
+          type: integer
+        frame:
+          type: boolean
+        padding:
+          type: array
+          items:
+            type: integer
+        position:
+          type: array
+          items:
+            type: integer
+
+    StylesMap:
+      type: object
+      properties:
+        id:
+          type: string
+        objectType:
+          type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/StyleLink'
+
+    StyleLink:
+      type: object
+      properties:
+        textId:
+          type: string
+        styleId:
+          type: string
+        start:
+          type: integer
+        end:
+          type: integer
