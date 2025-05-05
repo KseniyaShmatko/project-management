@@ -1,0 +1,14 @@
+{
+    "_id": ObjectId("..."),
+    "object_type": "text",
+    "schema": {
+        "fields": [
+            "title": "string",
+            "required": "boolean",
+            "type": "string"
+        ],
+        "properties": "array",
+        "handlers": "array"
+    },
+    "created_at": ISODate("2024-12-01T12:00:00Z")
+}

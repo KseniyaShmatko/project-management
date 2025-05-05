@@ -1,0 +1,13 @@
+{
+    "_id": ObjectId("..."),
+    "user_id": 123,
+    "content": "Текстовый контент...",
+    "metadata": {
+        "tags": ["example", "text"],
+        "created_at": ISODate("2024-12-01T12:00:00Z")
+    },
+    "additional_fields": {
+        "field1": "value1",
+        "field2": "value2"
+    }
+}
