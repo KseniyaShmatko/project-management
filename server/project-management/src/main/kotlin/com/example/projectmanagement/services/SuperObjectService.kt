@@ -8,13 +8,35 @@ import org.springframework.stereotype.Service
 class SuperObjectService(
     private val repo: SuperObjectRepository
 ) {
-    fun create(superObject: SuperObject): SuperObject = repo.save(superObject)
+    fun create(s: SuperObject): SuperObject {
+        val createdSO = repo.save(s)
+        return createdSO
+    }
 
-    fun getByFileId(fileId: Long): SuperObject? = repo.findByFileId(fileId)
+    fun getByFileId(fileId: Long): SuperObject? {
+        val foundSO = repo.findByFileId(fileId)
+        return foundSO
+    }
 
     fun getById(id: String): SuperObject = repo.findById(id).orElseThrow { NoSuchElementException("Not found") }
 
-    fun update(id: String, updated: SuperObject): SuperObject { updated.id = id; return repo.save(updated) }
+    fun update(id: String, updates: SuperObject): SuperObject {
+        val existingSO = repo.findById(id)
+            .orElseThrow { NoSuchElementException("SuperObject with id '$id' not found for update") }
+
+        updates.name?.let { existingSO.name = it }
+        updates.serviceType?.let { existingSO.serviceType = it }
+        updates.lastChangeDate?.let { existingSO.lastChangeDate = it }
+        updates.template?.let { existingSO.template = it }
+        updates.decoration?.let { existingSO.decoration = it }
+        updates.firstItem?.let { existingSO.firstItem = it }
+        updates.lastItem?.let { existingSO.lastItem = it }
+        updates.checkSum?.let { existingSO.checkSum = it }
+        updates.stylesMapId?.let { existingSO.stylesMapId = it }
+
+        val updatedSO = repo.save(existingSO)
+        return updatedSO
+    }
     
     fun delete(id: String) = repo.deleteById(id)
 }
