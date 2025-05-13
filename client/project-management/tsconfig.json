@@ -1,0 +1,28 @@
+{
+    "compilerOptions": {
+      "target": "es5", // или "es6", "es2016" и т.д. в зависимости от целевых браузеров
+      "lib": [
+        "dom",
+        "dom.iterable",
+        "esnext"
+      ],
+      "allowJs": true,
+      "skipLibCheck": true,
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "strict": true,
+      "forceConsistentCasingInFileNames": true,
+      "noFallthroughCasesInSwitch": true,
+      "module": "esnext",
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "noEmit": true, // CRA сам управляет сборкой, TypeScript только проверяет типы
+      "jsx": "react-jsx" // Для нового JSX Transform в React 17+
+      // "baseUrl": "src" // Раскомментируй, если хочешь абсолютные импорты от src/
+    },
+    "include": [
+      "src" // Указывает TypeScript, какие файлы обрабатывать
+    ]
+  }
+  
