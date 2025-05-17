@@ -9,6 +9,7 @@
     background-color: #fff;
     border: 1px solid #ddd; // или #ddd
     padding: 20px 40px; // Увеличим боковые отступы для вида "документа"
+    margin-top: 10px;
     min-height: 800px; // Для вида листа A4
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     font-family: 'Times New Roman', Times, serif; // или 'Times New Roman', Times, serif
@@ -25,4 +26,12 @@
       min-height: auto; // Минимальная высота будет определяться контентом или line-height
       margin-bottom: 0.5em; // Отступ между "виртуальными" параграфами/блоками (ставится на p внутри)
     }
+}
+
+.ce-popover-item-html[data-item-name="style"] path {
+  stroke: none; /* Используем !important, если другие стили переопределяют этот, но старайтесь избегать его, если возможно */
+}
+
+.codex-editor__redactor {
+  padding-top: 20px;
 }

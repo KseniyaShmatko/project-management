@@ -27,17 +27,19 @@ export interface Template {
   export type BlockData = string | ImageBlockData | { [key: string]: any }; // Общий тип
   
   export interface ContentBlock {
-    id?: string; // ID будет присвоен бэкендом при создании
-    objectType: string; // 'text', 'image', 'list', 'video', etc.
+    id?: string;
+    objectType: string; // Тип от Editor.js, сохраненный на бэке
     nextItem?: string | null;
     prevItem?: string | null;
-    data: BlockData; // Поле data теперь типизировано
-    label?: string;
-    // Для списков (по аналогии с твоим Swagger, где data была string)
-    // data может быть объектом { items: string[] } для objectType: 'list'
-    items?: string[]; // Если objectType === 'list'
-    marker?: string;  // Если objectType === 'list'
-    position?: string; // Например, 'left', 'center', 'right' для изображений
+    data: { [key: string]: any }; // data от Editor.js блока, сохраненное на бэке
+  }
+  
+  // DTO для отправки данных блока на бэкенд (в метод syncDocumentBlocks)
+  export interface EditorJsBlockData { // Добавил Dto в конце для ясности, что это для передачи
+    id?: string | null; // ID, который мог сгенерировать Editor.js (может быть null для новых блоков)
+    type: string;        // Тип блока из Editor.js (e.g., "paragraph", "header")
+    data: { [key: string]: any }; // Объект данных блока из Editor.js
+    // tunes?: { [key: string]: any }; // Если используешь "tunes" (настройки блока)
   }
   
   export interface SuperObject {

@@ -16,7 +16,7 @@ const root = ReactDOM.createRoot(rootElement);
 
 // Рендерим компонент App в этот корень
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
     <App />
-  </React.StrictMode>
+  // </React.StrictMode>
 );

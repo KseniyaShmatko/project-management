@@ -1,6 +1,6 @@
 // src/shared/api/noteApi.ts
 import apiClient from './client';
-import { SuperObject, ContentBlock } from './models'; // Предполагаем, что типы в models.ts
+import { SuperObject, ContentBlock, EditorJsBlockData } from './models'; // Предполагаем, что типы в models.ts
 
 // --- SuperObject API ---
 export const getSuperObjectByFileId = async (fileId: number): Promise<SuperObject | null> => {
@@ -62,19 +62,60 @@ export const deleteContentBlock = async (id: string): Promise<void> => {
 
 // Функция для загрузки всех блоков для SuperObject (нужно будет адаптировать)
 // Эта функция предполагает, что мы знаем ID всех блоков или можем пройти по цепочке
-export const getAllContentBlocksForSuperObject = async (superObject: SuperObject): Promise<ContentBlock[]> => {
-  const blocks: ContentBlock[] = [];
-  let currentBlockId = superObject.firstItem;
+// export const getAllContentBlocksForSuperObject = async (superObject: SuperObject): Promise<ContentBlock[]> => {
+//   const blocks: ContentBlock[] = [];
+//   let currentBlockId = superObject.firstItem;
 
-  while (currentBlockId) {
-    try {
-      const block = await getContentBlockById(currentBlockId);
-      blocks.push(block);
-      currentBlockId = block.nextItem;
-    } catch (error) {
-      console.error(`Failed to load block ${currentBlockId}`, error);
-      currentBlockId = null; // Прервать цикл при ошибке
+//   while (currentBlockId) {
+//     try {
+//       const block = await getContentBlockById(currentBlockId);
+//       blocks.push(block);
+//       currentBlockId = block.nextItem;
+//     } catch (error) {
+//       console.error(`Failed to load block ${currentBlockId}`, error);
+//       currentBlockId = null; // Прервать цикл при ошибке
+//     }
+//   }
+//   return blocks;
+// };
+
+export const getAllContentBlocksForSuperObject = async (superObject: SuperObject): Promise<ContentBlock[]> => {
+    const blocks: ContentBlock[] = [];
+    if (!superObject.firstItem) {
+      return blocks;
     }
-  }
-  return blocks;
+    let currentBlockId: string | null | undefined = superObject.firstItem;
+  
+    while (currentBlockId) {
+      try {
+        // ВАЖНО: getContentBlockById должна быть экспортирована и импортирована здесь, если она в этом же файле
+        const block = await getContentBlockById(currentBlockId);
+        if (block) {
+          blocks.push(block);
+          currentBlockId = block.nextItem;
+        } else {
+          console.warn(`Block with id ${currentBlockId} not found, stopping chain.`);
+          currentBlockId = null;
+        }
+      } catch (error: any) {
+        if (error.response && error.response.status === 404) {
+          console.warn(`Block with id ${currentBlockId} returned 404, stopping chain.`);
+        } else {
+          console.error(`Failed to load block ${currentBlockId}`, error);
+        }
+        currentBlockId = null;
+      }
+    }
+    return blocks;
+};
+
+export const syncDocumentBlocksApi = async (
+    superObjectId: string,
+    blocksPayload: EditorJsBlockData[]
+): Promise<SuperObject> => { // Предполагаем, что бэкенд вернет обновленный SuperObject
+  const response = await apiClient.put<SuperObject>(
+    `/super-objects/${superObjectId}/sync-blocks`,
+    blocksPayload // Отправляем массив DTO
+  );
+  return response.data;
 };
