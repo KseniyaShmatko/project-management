@@ -2,11 +2,13 @@ package com.example.projectmanagement.models.mongo
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.index.Indexed
 
 @Document(collection = "super_objects")
 data class SuperObject(
     @Id
     var id: String? = null,
+    @Indexed(unique = true)
     var fileId: Long? = null,
     var serviceType: String? = null,
     var lastChangeDate: String? = null,
