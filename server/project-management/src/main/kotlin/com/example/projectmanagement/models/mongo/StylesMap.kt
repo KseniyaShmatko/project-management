@@ -12,7 +12,7 @@ data class StylesMap(
 )
 
 data class StyleLink(
-    var textId: String? = null,
+    var elementId: String? = null,
     var styleId: String? = null,
     var start: Int? = null,
     var end: Int? = null

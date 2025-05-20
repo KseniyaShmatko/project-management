@@ -1,19 +1,71 @@
 // src/shared/api/noteApi.ts
 import apiClient from './client';
-import { SuperObject, ContentBlock, EditorJsBlockData } from './models'; // Предполагаем, что типы в models.ts
+import { 
+  SuperObject, ContentBlock, EditorJsBlockData, ApiUploadResponse, 
+  Project, ProjectFile, CreateProjectPayload, UpdateProjectPayload,
+  FileMetadata, FileCreateDto, FileType, ProjectParticipant, 
+  LoginRequest, RegisterRequest, AuthResponse, UserProfile,
+  ProjectUserActionPayload, ProjectRole
+} from './models';
 
-// --- SuperObject API ---
-export const getSuperObjectByFileId = async (fileId: number): Promise<SuperObject | null> => {
-  try {
-    const response = await apiClient.get<SuperObject>(`/super-objects/by-file/${fileId}`);
-    return response.data;
-  } catch (error: any) {
-    if (error.response && error.response.status === 404) {
-      return null; // Если не найдено, возвращаем null, а не кидаем ошибку
-    }
-    throw error; // Перебрасываем другие ошибки
+const AUTH_TOKEN_KEY = 'authToken';
+
+export const setAuthToken = (token: string | null) => {
+  if (token) {
+    localStorage.setItem(AUTH_TOKEN_KEY, token);
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    delete apiClient.defaults.headers.common['Authorization'];
   }
 };
+
+export const getAuthToken = (): string | null => {
+  return localStorage.getItem(AUTH_TOKEN_KEY);
+};
+
+// Инициализация токена при загрузке модуля, если он есть в localStorage
+const initialToken = getAuthToken();
+if (initialToken) {
+  setAuthToken(initialToken);
+}
+
+// --- API АУТЕНТИКАЦИИ ---
+export const loginUserApi = async (loginData: LoginRequest): Promise<AuthResponse> => {
+  const response = await apiClient.post<AuthResponse>('/users/login', loginData);
+  if (response.data && response.data.token) {
+    setAuthToken(response.data.token);
+  }
+  return response.data;
+};
+
+export const registerUserApi = async (registerData: RegisterRequest): Promise<UserProfile> => { // Бэкенд возвращает данные пользователя без токена при регистрации
+  const response = await apiClient.post<UserProfile>('/users/register', registerData);
+  return response.data;
+};
+
+export const getCurrentUserApi = async (): Promise<UserProfile> => {
+  const response = await apiClient.get<UserProfile>('/users/me');
+  return response.data;
+};
+
+export const logoutUser = () => {
+  setAuthToken(null);
+  // Здесь можно добавить вызов эндпоинта /logout на бэкенде, если он есть и инвалидирует токен
+};
+
+
+// export const getSuperObjectByFileId = async (fileId: number): Promise<SuperObject | null> => {
+//   try {
+//     const response = await apiClient.get<SuperObject>(`/super-objects/by-file/${fileId}`);
+//     return response.data;
+//   } catch (error: any) {
+//     if (error.response && error.response.status === 404) {
+//       return null; 
+//     }
+//     throw error;
+//   }
+// };
 
 export const createSuperObject = async (superObjectData: SuperObject): Promise<SuperObject> => {
   const response = await apiClient.post<SuperObject>('/super-objects', superObjectData);
@@ -25,28 +77,12 @@ export const updateSuperObject = async (id: string, superObjectData: Partial<Sup
   return response.data;
 };
 
-// Пока не добавляем deleteSuperObject, если не нужно немедленно
-
-// --- ContentBlock API ---
-// Важно: твой Swagger не описывает эндпоинт для получения всех блоков для SuperObject.
-// Обычно, либо SuperObject приходит с вложенными блоками, либо есть отдельный эндпоинт
-// типа GET /super-objects/{superObjectId}/content-blocks
-// ИЛИ мы загружаем блоки по их ID, если знаем firstItem/nextItem.
-//
-// Для начала, предположим, что мы будем загружать блоки по цепочке nextItem,
-// или что SuperObject будет содержать массив ID блоков.
-//
-// Самый простой вариант, если SuperObject *уже содержит* массив ID блоков,
-// Или если нам нужно загрузить блоки по очереди, начиная с `firstItem`.
-
-// Для индивидуальных операций с блоками:
 export const getContentBlockById = async (blockId: string): Promise<ContentBlock> => {
   const response = await apiClient.get<ContentBlock>(`/content-blocks/${blockId}`);
   return response.data;
 };
 
 export const createContentBlock = async (blockData: ContentBlock): Promise<ContentBlock> => {
-  // Backend ожидает ContentBlock целиком. Убедись, что prevItem/nextItem корректно установлены.
   const response = await apiClient.post<ContentBlock>('/content-blocks', blockData);
   return response.data;
 };
@@ -60,25 +96,6 @@ export const deleteContentBlock = async (id: string): Promise<void> => {
   await apiClient.delete(`/content-blocks/${id}`);
 };
 
-// Функция для загрузки всех блоков для SuperObject (нужно будет адаптировать)
-// Эта функция предполагает, что мы знаем ID всех блоков или можем пройти по цепочке
-// export const getAllContentBlocksForSuperObject = async (superObject: SuperObject): Promise<ContentBlock[]> => {
-//   const blocks: ContentBlock[] = [];
-//   let currentBlockId = superObject.firstItem;
-
-//   while (currentBlockId) {
-//     try {
-//       const block = await getContentBlockById(currentBlockId);
-//       blocks.push(block);
-//       currentBlockId = block.nextItem;
-//     } catch (error) {
-//       console.error(`Failed to load block ${currentBlockId}`, error);
-//       currentBlockId = null; // Прервать цикл при ошибке
-//     }
-//   }
-//   return blocks;
-// };
-
 export const getAllContentBlocksForSuperObject = async (superObject: SuperObject): Promise<ContentBlock[]> => {
     const blocks: ContentBlock[] = [];
     if (!superObject.firstItem) {
@@ -88,7 +105,6 @@ export const getAllContentBlocksForSuperObject = async (superObject: SuperObject
   
     while (currentBlockId) {
       try {
-        // ВАЖНО: getContentBlockById должна быть экспортирована и импортирована здесь, если она в этом же файле
         const block = await getContentBlockById(currentBlockId);
         if (block) {
           blocks.push(block);
@@ -112,10 +128,173 @@ export const getAllContentBlocksForSuperObject = async (superObject: SuperObject
 export const syncDocumentBlocksApi = async (
     superObjectId: string,
     blocksPayload: EditorJsBlockData[]
-): Promise<SuperObject> => { // Предполагаем, что бэкенд вернет обновленный SuperObject
-  const response = await apiClient.put<SuperObject>(
-    `/super-objects/${superObjectId}/sync-blocks`,
-    blocksPayload // Отправляем массив DTO
+): Promise<SuperObject> => {
+  const response = await apiClient.put<SuperObject>( `/super-objects/${superObjectId}/sync-blocks`,  blocksPayload);
+
+  return response.data;
+};
+
+export const uploadImageApi = async (file: File): Promise<ApiUploadResponse> => {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  try {
+    const response = await apiClient.post<ApiUploadResponse>(
+      '/files-storage/upload/image',
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error('API Error in uploadImageApi:', error.response?.data || error.message);
+    return {
+      success: 0,
+      file: { url: '', name: file.name },
+      message: error.response?.data?.message || error.message || 'Ошибка загрузки файла на сервер',
+    };
+  }
+};
+
+// getAllProjects теперь соответствует ProjectResponseDto с бэка
+export const getAllProjectsApi = async (): Promise<Project[]> => { // Возвращаемый тип уже Project[]
+  try {
+    const response = await apiClient.get<Project[]>('/projects'); 
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка при получении списка проектов:", error);
+    // Можно настроить более детальную обработку ошибок
+    if ((error as any).response?.status === 401) {
+        // Пользователь не авторизован, возможно, перенаправить на логин
+        logoutUser(); // Очистить токен
+    }
+    throw error; // Перебрасываем ошибку для обработки в компоненте
+  }
+};
+
+export const createProjectApi = async (projectData: CreateProjectPayload): Promise<Project> => {
+  const response = await apiClient.post<Project>('/projects', projectData);
+  return response.data;
+};
+
+// getProjectByIdApi должен возвращать Project (ProjectResponseDto)
+export const getProjectByIdApi = async (projectId: number): Promise<Project> => {
+  const response = await apiClient.get<Project>(`/projects/${projectId}`);
+  return response.data;
+};
+
+export const createFileMetadataApi = async (fileDto: FileCreateDto): Promise<FileMetadata> => {
+  const response = await apiClient.post<FileMetadata>('/files', fileDto); // Предполагаемый эндпоинт
+  return response.data;
+};
+
+// updateFileApi - нужно уточнить, что ожидает бэкенд
+// Если бэкенд PUT /files/{fileId} ожидает FileCreateDto (или похожий DTO):
+export const updateFileApi = async (fileId: number, fileUpdateDto: Partial<FileCreateDto>): Promise<FileMetadata> => {
+  // Если бэк ожидает не Partial, а полный DTO с некоторыми обязательными полями, их нужно передать
+  const response = await apiClient.put<FileMetadata>(`/files/${fileId}`, fileUpdateDto);
+  return response.data;
+};
+
+// linkFileToProjectApi - остается как есть, проверяем только URL и параметры
+export const linkFileToProjectApi = async (projectId: number, fileId: number): Promise<{project_id: number, file_id: number}> => { 
+  const response = await apiClient.post(`/projects/${projectId}/files/link?file_id=${fileId}`);
+  return response.data;
+};
+
+// getAllFileTypesApi - эндпоинт /file-types должен существовать на бэке
+export const getAllFileTypesApi = async (): Promise<FileType[]> => {
+  const response = await apiClient.get<FileType[]>('/file-types'); // Убедитесь, что такой эндпоинт есть
+  return response.data;
+};
+
+// getFilesForProjectApi теперь возвращает ProjectFile[]
+// Эндпоинт /projects/{projectId}/files-details на бэке возвращает List<ProjectFileResponseDto>
+// Это соответствует ProjectFile[] на фронте
+export const getFilesForProjectApi = async (projectId: number): Promise<ProjectFile[]> => {
+  const response = await apiClient.get<ProjectFile[]>(`/projects/${projectId}/files`); 
+  return response.data;
+};
+
+
+// --- API для SuperObject и ContentBlock (оставляем как есть, если они не зависят от структуры Project/User) ---
+// Но, возможно, createSuperObject должен использовать authorId из текущего пользователя.
+// Ваша текущая версия createSuperObject принимает SuperObject, где fileId и serviceType - ключевые.
+
+export const getSuperObjectByFileId = async (fileId: number): Promise<SuperObject | null> => {
+  try {
+    const response = await apiClient.get<SuperObject>(`/super-objects/by-file/${fileId}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response && error.response.status === 404) {
+      return null; 
+    }
+    console.error(`Ошибка загрузки SuperObject по FileID ${fileId}:`, error);
+    throw error;
+  }
+};
+
+export const updateProjectApi = async (projectId: number, projectUpdateData: UpdateProjectPayload): Promise<Project> => {
+  const response = await apiClient.put<Project>(`/projects/${projectId}`, projectUpdateData);
+  return response.data;
+};
+
+export const getSuperObjectByMongoId = async (mongoId: string): Promise<SuperObject | null> => {
+  try {
+    const response = await apiClient.get<SuperObject>(`/super-objects/${mongoId}`);
+    return response.data;
+  } catch (error: any) {
+    if (error.response && error.response.status === 404) {
+      return null;
+    }
+    console.error(`Ошибка загрузки SuperObject по MongoID ${mongoId}:`, error);
+    throw error;
+  }
+};
+
+export const updateFileSuperObjectId = async (fileId: number, superObjectId: string): Promise<FileMetadata> => {
+  const response = await apiClient.patch<FileMetadata>(
+    `/files/${fileId}/super-object`, 
+    { superObjectId }
   );
   return response.data;
+};
+
+export const updateFileName = async (fileId: number, name: string): Promise<FileMetadata> => {
+  const response = await apiClient.patch<FileMetadata>(`/files/${fileId}/name`, { name });
+  return response.data;
+};
+
+// Поиск пользователей по логину
+export const searchUsersByLoginApi = async (loginQuery: string): Promise<UserProfile[]> => {
+  const response = await apiClient.get<UserProfile[]>(`/users/search?login=${encodeURIComponent(loginQuery)}`);
+  return response.data;
+};
+
+// Получение списка участников проекта
+export const getProjectParticipantsApi = async (projectId: number): Promise<ProjectParticipant[]> => {
+  const response = await apiClient.get<ProjectParticipant[]>(`/projects-users/project/${projectId}/users`);
+  return response.data;
+};
+
+// Добавление пользователя в проект или обновление его роли
+// Бэкенд POST /projects-users ожидает ProjectUserDto { projectId, userId, role }
+export const linkUserToProjectApi = async (payload: ProjectUserActionPayload): Promise<ProjectParticipant> => {
+    const response = await apiClient.post<ProjectParticipant>('/projects-users', payload);
+    return response.data;
+};
+// Бэкенд PUT /projects-users/project/{projectId}/user/{userId} ожидает { role }
+export const updateUserProjectRoleApi = async (projectId: number, userId: number, role: ProjectRole): Promise<ProjectParticipant> => {
+    const response = await apiClient.put<ProjectParticipant>(
+        `/projects-users/project/${projectId}/user/${userId}`,
+        { role } // Тело запроса { "role": "EDITOR" }
+    );
+    return response.data;
+};
+
+export const removeUserFromProjectApi = async (projectId: number, userId: number): Promise<void> => {
+  await apiClient.delete(`/projects-users/project/${projectId}/user/${userId}`);
 };

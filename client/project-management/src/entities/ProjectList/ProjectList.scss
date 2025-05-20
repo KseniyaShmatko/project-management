@@ -1,0 +1,27 @@
+.project-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--g-color-line-generic);
+    border-radius: 3px;
+  }
+
+  &--empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    color: var(--g-color-text-secondary);
+  }
+}
+  

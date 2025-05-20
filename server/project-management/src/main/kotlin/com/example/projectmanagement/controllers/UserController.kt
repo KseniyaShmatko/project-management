@@ -2,15 +2,22 @@ package com.example.projectmanagement.controllers
 
 import com.example.projectmanagement.models.User
 import com.example.projectmanagement.services.UserService
+import com.example.projectmanagement.controllers.dto.UserResponseDto
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/users")
 class UserController(private val userService: UserService) {
 
-    @PostMapping("/register")
-    fun registerUser(@RequestBody user: User): User {
-        return userService.registerUser(user)
+    @GetMapping("/search")
+    fun searchUsersByLogin(@RequestParam("login") loginQuery: String): ResponseEntity<List<UserResponseDto>> {
+        // Исключаем текущего пользователя из результатов поиска, если нужно
+        // val currentUser = SecurityContextHolder.getContext().authentication.principal as User
+        // val users = userService.searchUsersByLogin(loginQuery).filter { it.id != currentUser.id }
+
+        val users = userService.searchUsersByLogin(loginQuery)
+        return ResponseEntity.ok(users)
     }
 
     @GetMapping("/{user_id}")

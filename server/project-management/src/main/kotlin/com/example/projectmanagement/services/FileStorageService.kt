@@ -1,4 +1,3 @@
-// src/main/kotlin/com/example/projectmanagement/services/FileStorageService.kt
 package com.example.projectmanagement.services
 
 import com.example.projectmanagement.controllers.dto.FileDetails
@@ -10,11 +9,11 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.util.UUID
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @Service
 class FileStorageService(
-    // Тот же самый uploadDir, что и в WebConfig
-    @Value("\${file.upload-dir:\${user.home}/editorjs_uploads}")
+    @Value("\${file.upload-dir:\${user.home}/uploads_data}")
     private val uploadDir: String
 ) {
 
@@ -34,7 +33,6 @@ class FileStorageService(
         val originalFilename = file.originalFilename 
             ?: throw IllegalArgumentException("File name cannot be null")
         
-        // Генерируем уникальное имя файла, чтобы избежать коллизий
         val extension = originalFilename.substringAfterLast('.', "")
         val uniqueFilename = "${UUID.randomUUID()}.${extension}".lowercase()
 
@@ -42,39 +40,31 @@ class FileStorageService(
             if (file.isEmpty) {
                 throw RuntimeException("Failed to store empty file.")
             }
-            // Проверка на недопустимые символы в имени файла (для безопасности)
             if (uniqueFilename.contains("..")) {
                 throw RuntimeException("Cannot store file with relative path outside current directory $uniqueFilename")
             }
 
             Files.copy(file.inputStream, this.rootLocation.resolve(uniqueFilename), StandardCopyOption.REPLACE_EXISTING)
             
-            // Формируем URL, по которому файл будет доступен
-            // Важно: этот URL должен соответствовать тому, что настроено в WebConfig (resourcePath)
-            // Если есть context-path, его тоже нужно учесть
-            // Предположим, сервер работает на localhost:8080, context-path нет
-            val fileUrl = "/uploads/$uniqueFilename" // Относительный URL
-            // Для полного URL, если нужно клиенту:
-            // val baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()
-            // val fullFileUrl = "$baseUrl/uploads/$uniqueFilename"
-
-
-            println("File stored: $uniqueFilename, URL: $fileUrl")
+            val baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString()
+            val fullFileUrl = "$baseUrl/uploads/$uniqueFilename"
+    
+            println("File stored: $uniqueFilename, URL: $fullFileUrl")
 
             return FileUploadResponse(
                 success = 1,
                 file = FileDetails(
-                    url = fileUrl, // Отдаем относительный URL, клиент сам добавит домен
+                    url = fullFileUrl,
                     name = originalFilename,
                     size = file.size
                 )
             )
         } catch (e: Exception) {
             println("Failed to store file $uniqueFilename: ${e.message}")
-            // В реальном приложении здесь должна быть более детальная обработка ошибок
-            throw RuntimeException("Failed to store file $uniqueFilename", e) 
-            // Или вернуть FileUploadResponse с success = 0
-            // return FileUploadResponse(success = 0, file = FileDetails(url = "", name = originalFilename), message = e.message)
+            return FileUploadResponse(
+                success = 0,
+                file = FileDetails(url = "", name = originalFilename),
+            )
         }
     }
 }

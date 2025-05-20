@@ -15,10 +15,10 @@ data class SuperObject(
     var name: String? = null,
     var template: Template? = null,
     var decoration: Decoration? = null,
-    var firstItem: String? = null,     // id первой ноды
-    var lastItem: String? = null,      // id последней ноды
+    var firstItem: String? = null,
+    var lastItem: String? = null,
     var checkSum: Long? = null,
-    var stylesMapId: String? = null    // id карты стилей
+    var stylesMapId: String? = null
 )
 
 data class Template(

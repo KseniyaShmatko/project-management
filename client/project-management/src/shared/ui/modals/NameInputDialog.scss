@@ -1,0 +1,26 @@
+.name-input-dialog-content { 
+  min-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.name-input-dialog__body {
+  .g-textinput-wrapper {
+    margin-bottom: 8px; 
+  }
+}
+
+.name-input-dialog__error-text {
+  margin-top: 8px;
+}
+
+.name-input-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--g-color-line-generic);
+}

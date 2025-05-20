@@ -1,0 +1,83 @@
+.sidebar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; // Занимает всю высоту
+  width: 300px; // Примерная ширина сайдбара
+  background-color: #f8f8f8; // Цвет фона сайдбара
+  border-right: 1px solid #e0e0e0;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.sidebar__header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+
+  .sidebar__logo {
+    width: auto;
+    height: 40px;
+  }
+  .sidebar__app-name {
+    font-weight: 600;
+    margin-left: 20px;
+
+    justify-self: center;
+    align-self: center;
+
+    font-size: 18px;
+  }
+}
+
+.sidebar__projects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+
+  .sidebar__projects-title {
+    font-weight: 500;
+  }
+  .g-button { // Стили для кнопки плюса, можно сделать компактнее
+    min-width: auto;
+  }
+}
+
+.sidebar__loader-container {
+  flex-grow: 1; // Чтобы список проектов занимал доступное место
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+// ProjectList будет здесь, предполагаем, что он занимает flex-grow: 1
+// и имеет overflow-y: auto; внутри себя.
+
+.sidebar__footer {
+  margin-top: auto; // Прижимает футер к низу
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+
+  .sidebar__user-profile {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; // Чтобы кнопка выхода была справа
+
+    .g-user { // Для стилизации компонента User от Gravity
+      // Можно настроить отступы, если нужно
+      flex-grow: 1; // Занимает доступное пространство слева от кнопки
+    }
+    .sidebar__logout-button {
+      // Стили для кнопки выхода, если нужно
+      min-width: auto; // Компактная кнопка
+      padding: 5px;
+      .g-button__icon {
+        justify-self: center;
+        align-self: center;
+        margin-right: 0; // Убрать отступ у иконки, если текста нет
+      }
+    }
+  }
+}

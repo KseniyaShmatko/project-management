@@ -11,6 +11,12 @@ import Strikethrough from 'editorjs-strikethrough';
 import { StyleInlineTool } from 'editorjs-style';
 // import InlineFontSizeTool from 'editorjs-inline-font-size-tool'; // ВРЕМЕННО ОТКЛЮЧЕН
 import ImageTool from '@editorjs/image'
+import Quote from '@editorjs/quote';   // <--- ИМПОРТ QUOTE
+import CodeTool from '@editorjs/code';
+import Table from '@editorjs/table';  
+import Embed from '@editorjs/embed';
+
+import { editorJsRussianLocale } from '../../../shared/i18n/editorjs-ru';
 
 interface EditorTools {
     [toolName: string]: BlockToolConstructable | ToolSettings;
@@ -102,7 +108,7 @@ const EditorJsWrapper: React.FC<EditorJsWrapperProps> = ({
       marker: { class: Marker as any, shortcut: 'CMD+SHIFT+M' },
       style: {
         class: StyleInlineTool as any,
-        config: { style: [ 'color', 'background-color', 'font-size', 'font-family', 'border', 'text-align' ] }
+        config: { style: [ 'color', 'background-color', 'font-size', 'font-family', 'border', 'text-align' ] },
       },
       image: { // <--- ДОБАВЛЕНИЕ ИНСТРУМЕНТА IMAGE
         class: ImageTool as any,
@@ -144,8 +150,48 @@ const EditorJsWrapper: React.FC<EditorJsWrapperProps> = ({
           // Например:
           // buttons: ['caption', 'withBorder', 'stretched', 'withBackground'],
           // captionPlaceholder: 'Введите подпись к изображению',
-          // types: 'image/*, .webp', // Разрешенные типы файлов
+          types: 'image/png, image/jpeg, image/gif, image/webp, image/svg+xml', 
         },
+      },
+      quote: {
+        class: Quote,
+        inlineToolbar: true, // Позволяет форматировать текст внутри цитаты
+        shortcut: 'CMD+SHIFT+O',
+        config: {
+          quotePlaceholder: 'Введите цитату', // Перевод нужен будет в i18n
+          captionPlaceholder: 'Автор цитаты', // Перевод нужен будет в i18n
+        },
+      },
+      code: {
+        class: CodeTool,
+        shortcut: 'CMD+SHIFT+C',
+        config: {
+          placeholder: 'Введите код', // Перевод нужен будет в i18n
+        },
+      },
+      table: {
+        class: Table as any,
+        inlineToolbar: true, // Позволяет форматировать текст внутри ячеек таблицы
+        config: {
+          rows: 2, // Начальное количество строк при создании таблицы
+          cols: 3, // Начальное количество столбцов
+          // withHeadings: true, // Раскомментируйте, если хотите, чтобы по умолчанию первая строка была заголовком
+                               // Либо пользователь сможет это включить через настройки таблицы
+        },
+      },
+      embed: {
+        class: Embed,
+        config: {
+          services: {
+              youtube: true,
+              coub: true,
+              imgur: true,
+              gfycat: true,
+              twitch: true,
+              vimeo: true,
+              github: true,
+            }
+          }
       },
     };
 
@@ -153,6 +199,7 @@ const EditorJsWrapper: React.FC<EditorJsWrapperProps> = ({
       holder: holderRef.current, // Использование ref на DOM-элемент
       placeholder: 'Начните вводить текст или выберите блок...',
       readOnly: readOnly,
+      i18n: editorJsRussianLocale,
       data: initialData || { blocks: [] },
       onReady: () => {
         console.log(`[EditorJsWrapper] Editor.js ГОТОВ для holderId: ${holderId}`);

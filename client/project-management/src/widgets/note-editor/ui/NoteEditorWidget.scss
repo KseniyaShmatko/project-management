@@ -1,37 +1,52 @@
-.note-editor-widget {
-    /* Стили для общего контейнера виджета, если нужны */
-    h2 {
-      margin-bottom: 15px;
-    }
-}
-  
-.note-paper {
-    background-color: #fff;
-    border: 1px solid #ddd; // или #ddd
-    padding: 20px 40px; // Увеличим боковые отступы для вида "документа"
-    margin-top: 10px;
-    min-height: 800px; // Для вида листа A4
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    font-family: 'Times New Roman', Times, serif; // или 'Times New Roman', Times, serif
-    font-size: 16px; // Стандартный размер шрифта для документа
-  
-    // Важно: убрать отступы/рамки у отдельных EditableTextBlock,
-    // чтобы они сливались в единый документ.
-    .editable-text-block-wrapper {
-      margin-bottom: 0; // Убираем отступ между обертками блоков
-    }
-    .slate-editable-area {
-      border: none !important; // Убеждаемся, что нет рамки
-      padding: 0 !important;  
-      min-height: auto; // Минимальная высота будет определяться контентом или line-height
-      margin-bottom: 0.5em; // Отступ между "виртуальными" параграфами/блоками (ставится на p внутри)
-    }
+.note-editor-widget-container {
+  h1 {
+    margin-bottom: 20px;
+    justify-self: center;
+  }
 }
 
 .ce-popover-item-html[data-item-name="style"] path {
-  stroke: none; /* Используем !important, если другие стили переопределяют этот, но старайтесь избегать его, если возможно */
+  stroke: none;
 }
 
 .codex-editor__redactor {
-  padding-top: 20px;
+  min-height: 50vh;
+
+  padding-top: 60px;
+  padding-right: 20px;
+  padding-left: 20px;
+
+  font-size: 16px;
+}
+
+.ce-popover__container {
+  width: 250px !important;
+}
+
+.ce-popover-item-html label:has(input.id-input) {
+  display: none !important;
+}
+
+.ce-popover-item-html label:has(input.class-input) {
+  display: none !important;
+}
+
+.delete-button cdx-settings-button {
+  .codex-editor path {
+    stroke: none;
+  }
+}
+
+.ce-popover-item-html button:has(input.style-input) {
+  .codex-editor path {
+    stroke: none;
+  }
+}
+
+.delete-button {
+  svg {
+    path {
+      stroke: none;
+    }
+  }
 }

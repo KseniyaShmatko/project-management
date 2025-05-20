@@ -6,13 +6,11 @@ import org.springframework.data.mongodb.core.mapping.Document
 @Document(collection = "content_blocks")
 data class ContentBlock(
     @Id
-    var id: String? = null, // Editor.js тоже генерирует ID для блоков, можно использовать его или свой
-    var objectType: String? = null, // Это будет тип блока из Editor.js (e.g., "paragraph", "header", "image", "list")
+    var id: String? = null,
+    var objectType: String? = null,
 
-    var nextItem: String? = null, // Для связности твоих блоков
-    var prevItem: String? = null, // Для связности твоих блоков
+    var nextItem: String? = null, 
+    var prevItem: String? = null,
 
-    // Это поле станет КЛЮЧЕВЫМ. Оно будет хранить объект 'data' от блока Editor.js,
-    // сериализованный в JSON-строку, или ты можешь использовать Map<String, Any>
-    var data: Map<String, Any>? = null, // ИЛИ Map<String, Any>? ИЛИ String? (для JSON-строки)
+    var data: Map<String, Any>? = null,
 )

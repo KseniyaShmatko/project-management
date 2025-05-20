@@ -1,20 +1,28 @@
 // src/widgets/note-editor/ui/NoteEditorWidget.tsx
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import EditorJsWrapper from './EditorJsWrapper';
 import  EditorJS, { OutputData, BlockToolData, API as EditorJSAPI } from '@editorjs/editorjs';
 import { debounce } from 'lodash-es'; // Убедитесь, что lodash-es установлен
 
 import { SuperObject, ContentBlock, EditorJsBlockData } from '../../../shared/api/models';
 import {
-  getSuperObjectByFileId,
+  getSuperObjectByMongoId,
   createSuperObject,
   syncDocumentBlocksApi,
   getAllContentBlocksForSuperObject,
+  uploadImageApi
 } from '../../../shared/api/noteApi';
 import './NoteEditorWidget.scss';
 
 interface NoteEditorWidgetProps {
   noteId?: string; // fileId передается как строка
+  readOnly?: boolean;
+}
+
+interface ImageUploadResult { // Этот тип должен быть совместим с UploadResponseFormat в EditorJsWrapper
+  success: 1 | 0;
+  file: { url: string; name?: string; size?: number; [key: string]: any; };
+  message?: string;
 }
 
 // Конвертеры (оставляем как есть, если они работали корректно с типами)
@@ -63,7 +71,7 @@ const convertEditorJsBlocksToPayload = (editorJsBlocks: BlockToolData[]): Editor
 };
 
 
-export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId }) => {
+export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, readOnly = false }) => {
   const [currentSuperObject, setCurrentSuperObject] = useState<SuperObject | null>(null);
   // editorInitialData теперь будет хранить данные, с которыми БЫЛ ИНИЦИАЛИЗИРОВАН редактор
   const [editorInitialDataUsed, setEditorInitialDataUsed] = useState<OutputData | undefined>(undefined);
@@ -137,7 +145,7 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId }) =>
       }
       try {
         console.log(`[LOAD EFFECT] Загрузка/создание для fileId: ${fileId}`);
-        let so = await getSuperObjectByFileId(fileId);
+        let so = await getSuperObjectByMongoId(noteId);
         let blocksFromDb: ContentBlock[] = [];
 
         if (!so) {
@@ -186,6 +194,46 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId }) =>
     // Если бы использовали AbortController, здесь была бы отмена.
 
   }, [noteId]); // Зависимость только от noteId
+
+  const uploaderObject = useMemo(() => {
+    return {
+      uploadByFile: async (file: File): Promise<ImageUploadResult> => { // Возвращаемый тип ImageUploadResult
+        console.log('[ImageUploader] Вызов uploadImageApi для файла:', file.name);
+        // Вызываем нашу API-функцию
+        const result = await uploadImageApi(file); 
+        
+        // uploadImageApi уже должен возвращать объект в формате ImageUploadResult
+        // (или ApiUploadResponse, который совместим)
+        console.log('[ImageUploader] Ответ от uploadImageApi:', result);
+
+        // ВАЖНО: Обработка URL, если бэкенд возвращает относительный URL
+        if (result.success === 1 && result.file && result.file.url) {
+          // Если ваш apiClient НЕ настроен на бэкенд, работающий на том же origin + port,
+          // что и ваш dev-сервер (например, если baseURL у apiClient это 'http://localhost:8080',
+          // а ваш фронтенд на 'http://localhost:3000'), и бэкенд возвращает относительный URL (например, '/uploads/...'),
+          // то этот относительный URL будет пытаться загрузиться с 'http://localhost:3000/uploads/...', что неверно.
+          //
+          // В идеале, ваш `apiClient.baseURL` уже правильный (`http://localhost:8080`),
+          // и бэкенд (FileStorageService) возвращает ПОЛНЫЙ URL (схема+хост+порт+путь).
+          // Если же бэкенд упорно возвращает относительный URL типа "/uploads/image.png",
+          // а baseURL в apiClient "http://localhost:8080", то URL для картинки ДОЛЖЕН быть
+          // "http://localhost:8080/uploads/image.png".
+          //
+          // Проверьте, какой URL фактически приходит в result.file.url.
+          // Если он УЖЕ полный (начинается с http://localhost:8080), то ничего делать не надо.
+          // Если он относительный (/uploads/...), то его надо "дополнить".
+          
+          // Пример дополнения, если бэкенд вернул ОТНОСИТЕЛЬНЫЙ URL:
+          // const backendBaseUrl = 'http://localhost:8080'; // Из конфига или apiClient.defaults.baseURL
+          // if (result.file.url.startsWith('/')) {
+          //   result.file.url = `${backendBaseUrl}${result.file.url}`;
+          // }
+        }
+        return result; // uploadImageApi уже должен вернуть правильный формат
+      },
+      // uploadByUrl: async (url: string) => { /* ... */ }
+    };
+  }, []);
 
   // Debounced функция сохранения
   const debouncedSave = useCallback(
@@ -272,14 +320,15 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId }) =>
 
   return (
     <div className="note-editor-widget-container">
-      {currentSuperObject.name && <h2>{currentSuperObject.name}</h2>}
+      {currentSuperObject.name && <h1>{currentSuperObject.name}</h1>}
       <EditorJsWrapper
         key={currentSuperObject.id.toString()} // Ключ для перемонтирования при смене SO ID
         holderId={`editorjs-holder-${currentSuperObject.id}`}
         initialData={editorInitialDataUsed} // Только для ПЕРВОЙ инициализации этого инстанса
         onChange={handleEditorChange}
         onReady={handleEditorReady}
-        readOnly={false}
+        readOnly={readOnly}
+        imageUploader={uploaderObject}
       />
     </div>
   );

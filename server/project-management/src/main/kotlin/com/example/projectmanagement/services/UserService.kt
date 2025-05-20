@@ -2,16 +2,13 @@ package com.example.projectmanagement.services
 
 import com.example.projectmanagement.models.User
 import com.example.projectmanagement.repositories.UserRepository
+import com.example.projectmanagement.controllers.dto.UserResponseDto
 import org.springframework.stereotype.Service
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 
 @Service
 class UserService(private val userRepository: UserRepository) {
-
-    fun registerUser(user: User): User {
-        return userRepository.save(user)
-    }
 
     fun getUserById(id: Long): User {
         return userRepository.findById(id).orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "User not found") }
@@ -37,5 +34,14 @@ class UserService(private val userRepository: UserRepository) {
         } else {
             throw ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         }
+    }
+
+    private fun User.toUserResponseDto(): UserResponseDto = UserResponseDto(this.id, this.name, this.surname, this.login, this.photo)
+
+    fun searchUsersByLogin(loginQuery: String): List<UserResponseDto> {
+        // Предполагаем, что в UserRepository есть метод, например:
+        // fun findByLoginContainingIgnoreCase(login: String): List<User>
+        return userRepository.findByLoginContainingIgnoreCase(loginQuery)
+            .map { it.toUserResponseDto() }
     }
 }
