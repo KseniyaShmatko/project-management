@@ -1,4 +1,3 @@
-// src/entities/ProjectList/ProjectList.tsx
 import React from 'react';
 import { Text } from '@gravity-ui/uikit';
 

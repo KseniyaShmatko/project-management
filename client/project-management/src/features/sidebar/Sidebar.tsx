@@ -1,13 +1,14 @@
-// src/features/sidebar/Sidebar.tsx
 import React from 'react';
-import { useNavigate } from 'react-router-dom'; // Для перенаправления после logout
-import { Button, Text, Loader, User, Avatar } from '@gravity-ui/uikit'; // Добавили User и Avatar
-import { Plus, ArrowRightFromSquare } from '@gravity-ui/icons'; // Иконка для выхода
-import ProjectList from '../../entities/ProjectList/ProjectList'; // Убедитесь, что путь верный
-import { useAuth } from '../../shared/context/AuthContext'; // Импорт хука useAuth
+import { useNavigate } from 'react-router-dom';
+import { Button, Text, Loader, User } from '@gravity-ui/uikit';
+import { Plus, ArrowRightFromSquare } from '@gravity-ui/icons';
+
+import ProjectList from '../../entities/ProjectList/ProjectList';
+import { useAuth } from '../../shared/context/AuthContext';
+
 import './Sidebar.scss';
 
-interface ProjectListItem { // Переименовал Project в ProjectListItem для ясности
+interface ProjectListItem { 
   id: string;
   name: string;
 }
@@ -17,7 +18,7 @@ interface SidebarProps {
   selectedProjectId: string | null;
   onSelectProject: (projectId: string) => void;
   onCreateNewProject: () => void;
-  isLoading: boolean; // isLoading для списка проектов
+  isLoading: boolean;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -27,15 +28,14 @@ const Sidebar: React.FC<SidebarProps> = ({
   onCreateNewProject,
   isLoading,
 }) => {
-  const { user, isAuthenticated, logout, isLoading: isAuthLoading } = useAuth(); // Получаем данные пользователя и статус
+  const { user, isAuthenticated, logout, isLoading: isAuthLoading } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout(); // Вызываем функцию logout из AuthContext
-    navigate('/login'); // Перенаправляем на страницу входа
+    logout();
+    navigate('/login');
   };
 
-  // Определяем, что отображать для пользователя
   let userDisplay = null;
   if (isAuthLoading) {
     userDisplay = <Loader size="s" />;
@@ -44,21 +44,17 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="sidebar__user-profile">
         <User
             avatar={{
-                text: `${user.name.charAt(0)}${user.surname.charAt(0)}`, // Инициалы, если нет фото
+                text: `${user.name.charAt(0)}${user.surname.charAt(0)}`,
             }}
             name={`${user.name} ${user.surname}`}
-            // description={user.login} // Можно добавить логин, если нужно
             size="l" 
         />
         <Button view="flat" title="Выйти" onClick={handleLogout} className="sidebar__logout-button">
             <Button.Icon><ArrowRightFromSquare /></Button.Icon>
-            {/* Выйти */}
         </Button>
       </div>
     );
   } else {
-    // Если не авторизован (хотя на этой странице он должен быть авторизован, если это часть дашборда)
-    // Можно ничего не показывать или кнопку "Войти"
     userDisplay = (
         <Button view="action" onClick={() => navigate('/login')}>Войти</Button>
     );
@@ -66,7 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
 
   return (
-    <div className="sidebar-container"> {/* Добавил общий контейнер для стилизации */}
+    <div className="sidebar-container">
       <div className="sidebar__header">
         <img src="/bmstu-logo.png" alt="Logo" className="sidebar__logo" />
         <Text variant="subheader-2" className="sidebar__app-name">МГТУ им Н.Э. Баумана</Text>
@@ -76,11 +72,10 @@ const Sidebar: React.FC<SidebarProps> = ({
         <Text variant="subheader-1" className="sidebar__projects-title">Мои проекты</Text>
         <Button view="flat-action" size="l" onClick={onCreateNewProject} title="Создать новый проект">
           <Button.Icon><Plus /></Button.Icon>
-          {/* Новый */}
         </Button>
       </div>
 
-      {isLoading ? ( // isLoading для проектов
+      {isLoading ? (
         <div className="sidebar__loader-container">
           <Loader size="m" />
         </div>
@@ -91,8 +86,6 @@ const Sidebar: React.FC<SidebarProps> = ({
           onSelectProject={onSelectProject}
         />
       )}
-      
-      {/* Профиль пользователя внизу */}
       <div className="sidebar__footer">
         {userDisplay}
       </div>

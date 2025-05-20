@@ -1,4 +1,3 @@
-// src/entities/FileCard/FileCard.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { Card, Text, Icon, TextInput, Button } from '@gravity-ui/uikit';
 import { FileText, BranchesRightArrowRight, BranchesDown, Filmstrip, File, Pencil } from '@gravity-ui/icons'; 

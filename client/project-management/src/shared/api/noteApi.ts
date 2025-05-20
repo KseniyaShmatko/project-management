@@ -1,4 +1,3 @@
-// src/shared/api/noteApi.ts
 import apiClient from './client';
 import { 
   SuperObject, ContentBlock, EditorJsBlockData, ApiUploadResponse, 
@@ -24,13 +23,11 @@ export const getAuthToken = (): string | null => {
   return localStorage.getItem(AUTH_TOKEN_KEY);
 };
 
-// Инициализация токена при загрузке модуля, если он есть в localStorage
 const initialToken = getAuthToken();
 if (initialToken) {
   setAuthToken(initialToken);
 }
 
-// --- API АУТЕНТИКАЦИИ ---
 export const loginUserApi = async (loginData: LoginRequest): Promise<AuthResponse> => {
   const response = await apiClient.post<AuthResponse>('/users/login', loginData);
   if (response.data && response.data.token) {
@@ -39,7 +36,7 @@ export const loginUserApi = async (loginData: LoginRequest): Promise<AuthRespons
   return response.data;
 };
 
-export const registerUserApi = async (registerData: RegisterRequest): Promise<UserProfile> => { // Бэкенд возвращает данные пользователя без токена при регистрации
+export const registerUserApi = async (registerData: RegisterRequest): Promise<UserProfile> => {
   const response = await apiClient.post<UserProfile>('/users/register', registerData);
   return response.data;
 };
@@ -51,21 +48,7 @@ export const getCurrentUserApi = async (): Promise<UserProfile> => {
 
 export const logoutUser = () => {
   setAuthToken(null);
-  // Здесь можно добавить вызов эндпоинта /logout на бэкенде, если он есть и инвалидирует токен
 };
-
-
-// export const getSuperObjectByFileId = async (fileId: number): Promise<SuperObject | null> => {
-//   try {
-//     const response = await apiClient.get<SuperObject>(`/super-objects/by-file/${fileId}`);
-//     return response.data;
-//   } catch (error: any) {
-//     if (error.response && error.response.status === 404) {
-//       return null; 
-//     }
-//     throw error;
-//   }
-// };
 
 export const createSuperObject = async (superObjectData: SuperObject): Promise<SuperObject> => {
   const response = await apiClient.post<SuperObject>('/super-objects', superObjectData);
@@ -159,19 +142,16 @@ export const uploadImageApi = async (file: File): Promise<ApiUploadResponse> => 
   }
 };
 
-// getAllProjects теперь соответствует ProjectResponseDto с бэка
-export const getAllProjectsApi = async (): Promise<Project[]> => { // Возвращаемый тип уже Project[]
+export const getAllProjectsApi = async (): Promise<Project[]> => {
   try {
     const response = await apiClient.get<Project[]>('/projects'); 
     return response.data;
   } catch (error) {
     console.error("Ошибка при получении списка проектов:", error);
-    // Можно настроить более детальную обработку ошибок
     if ((error as any).response?.status === 401) {
-        // Пользователь не авторизован, возможно, перенаправить на логин
-        logoutUser(); // Очистить токен
+        logoutUser();
     }
-    throw error; // Перебрасываем ошибку для обработки в компоненте
+    throw error;
   }
 };
 
@@ -180,49 +160,35 @@ export const createProjectApi = async (projectData: CreateProjectPayload): Promi
   return response.data;
 };
 
-// getProjectByIdApi должен возвращать Project (ProjectResponseDto)
 export const getProjectByIdApi = async (projectId: number): Promise<Project> => {
   const response = await apiClient.get<Project>(`/projects/${projectId}`);
   return response.data;
 };
 
 export const createFileMetadataApi = async (fileDto: FileCreateDto): Promise<FileMetadata> => {
-  const response = await apiClient.post<FileMetadata>('/files', fileDto); // Предполагаемый эндпоинт
+  const response = await apiClient.post<FileMetadata>('/files', fileDto);
   return response.data;
 };
 
-// updateFileApi - нужно уточнить, что ожидает бэкенд
-// Если бэкенд PUT /files/{fileId} ожидает FileCreateDto (или похожий DTO):
 export const updateFileApi = async (fileId: number, fileUpdateDto: Partial<FileCreateDto>): Promise<FileMetadata> => {
-  // Если бэк ожидает не Partial, а полный DTO с некоторыми обязательными полями, их нужно передать
   const response = await apiClient.put<FileMetadata>(`/files/${fileId}`, fileUpdateDto);
   return response.data;
 };
 
-// linkFileToProjectApi - остается как есть, проверяем только URL и параметры
 export const linkFileToProjectApi = async (projectId: number, fileId: number): Promise<{project_id: number, file_id: number}> => { 
   const response = await apiClient.post(`/projects/${projectId}/files/link?file_id=${fileId}`);
   return response.data;
 };
 
-// getAllFileTypesApi - эндпоинт /file-types должен существовать на бэке
 export const getAllFileTypesApi = async (): Promise<FileType[]> => {
-  const response = await apiClient.get<FileType[]>('/file-types'); // Убедитесь, что такой эндпоинт есть
+  const response = await apiClient.get<FileType[]>('/file-types');
   return response.data;
 };
 
-// getFilesForProjectApi теперь возвращает ProjectFile[]
-// Эндпоинт /projects/{projectId}/files-details на бэке возвращает List<ProjectFileResponseDto>
-// Это соответствует ProjectFile[] на фронте
 export const getFilesForProjectApi = async (projectId: number): Promise<ProjectFile[]> => {
   const response = await apiClient.get<ProjectFile[]>(`/projects/${projectId}/files`); 
   return response.data;
 };
-
-
-// --- API для SuperObject и ContentBlock (оставляем как есть, если они не зависят от структуры Project/User) ---
-// Но, возможно, createSuperObject должен использовать authorId из текущего пользователя.
-// Ваша текущая версия createSuperObject принимает SuperObject, где fileId и serviceType - ключевые.
 
 export const getSuperObjectByFileId = async (fileId: number): Promise<SuperObject | null> => {
   try {
@@ -268,29 +234,25 @@ export const updateFileName = async (fileId: number, name: string): Promise<File
   return response.data;
 };
 
-// Поиск пользователей по логину
 export const searchUsersByLoginApi = async (loginQuery: string): Promise<UserProfile[]> => {
   const response = await apiClient.get<UserProfile[]>(`/users/search?login=${encodeURIComponent(loginQuery)}`);
   return response.data;
 };
 
-// Получение списка участников проекта
 export const getProjectParticipantsApi = async (projectId: number): Promise<ProjectParticipant[]> => {
   const response = await apiClient.get<ProjectParticipant[]>(`/projects-users/project/${projectId}/users`);
   return response.data;
 };
 
-// Добавление пользователя в проект или обновление его роли
-// Бэкенд POST /projects-users ожидает ProjectUserDto { projectId, userId, role }
 export const linkUserToProjectApi = async (payload: ProjectUserActionPayload): Promise<ProjectParticipant> => {
     const response = await apiClient.post<ProjectParticipant>('/projects-users', payload);
     return response.data;
 };
-// Бэкенд PUT /projects-users/project/{projectId}/user/{userId} ожидает { role }
+
 export const updateUserProjectRoleApi = async (projectId: number, userId: number, role: ProjectRole): Promise<ProjectParticipant> => {
     const response = await apiClient.put<ProjectParticipant>(
         `/projects-users/project/${projectId}/user/${userId}`,
-        { role } // Тело запроса { "role": "EDITOR" }
+        { role }
     );
     return response.data;
 };

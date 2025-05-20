@@ -1,35 +1,24 @@
-// src/features/project-access-modal/ProjectAccessModal.tsx
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Modal,
-  Button,
-  Text,
-  Select,
-  Avatar,
-  Icon,
-  TextInput,
-  Loader,
-  User, // Для отображения участников
-} from '@gravity-ui/uikit';
-import { PersonPlus, TrashBin, ArrowDown, ChevronDown } from '@gravity-ui/icons'; // Иконки
+import { Modal, Button,Text, Select, Icon, User } from '@gravity-ui/uikit';
+import { PersonPlus, TrashBin } from '@gravity-ui/icons';
 import { debounce } from 'lodash-es';
 
 import { ProjectParticipant, UserProfile, ProjectRole, ProjectUserActionPayload } from '../../../shared/api/models';
 import {
   searchUsersByLoginApi,
-  // getProjectParticipantsApi, // Участники будут передаваться через props
   linkUserToProjectApi,
   updateUserProjectRoleApi,
   removeUserFromProjectApi
-} from '../../../shared/api/noteApi'; // Предполагаем, что эти функции есть
+} from '../../../shared/api/noteApi';
+
 import './ProjectAccessModal.scss';
 
 interface ProjectAccessModalProps {
   isOpen: boolean;
   onClose: () => void;
-  project: { id: number; name: string; participants: ProjectParticipant[]; owner: { id: number } | null } | null; // Передаем текущих участников
-  onParticipantsUpdate: (updatedParticipants: ProjectParticipant[]) => void; // Коллбэк для обновления списка участников на странице
-  currentUserId: number; // ID текущего авторизованного пользователя
+  project: { id: number; name: string; participants: ProjectParticipant[]; owner: { id: number } | null } | null;
+  onParticipantsUpdate: (updatedParticipants: ProjectParticipant[]) => void;
+  currentUserId: number;
 }
 
 const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
@@ -56,8 +45,6 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
     }
   }, [project]);
 
-  console.log('searchedUsers',searchedUsers)
-  console.log('participants',participants)
   const debouncedSearch = useCallback(
     debounce(async (query: string) => {
       if (query.trim().length < 2) {
@@ -68,7 +55,6 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
       setIsLoadingSearch(true);
       try {
         const users = await searchUsersByLoginApi(query);
-        // Исключаем тех, кто уже участник, и самого себя (если не OWNER для возможности изменения своей роли, но это редкий кейс)
         const currentParticipantIds = participants.map(p => p.userId);
         setSearchedUsers(users.filter(u => !currentParticipantIds.includes(u.id) && u.id !== currentUserId ));
       } catch (e) {
@@ -100,9 +86,8 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
         role: selectedRole,
       };
       const newParticipantLink = await linkUserToProjectApi(payload);
-      // Обновляем список участников
       const updatedParticipantsList = [...participants, {
-        id: newParticipantLink.id, // Бэкенд должен вернуть ProjectParticipant или ProjectUserView
+        id: newParticipantLink.id,
         projectId: project.id,
         userId: selectedUser.id,
         login: selectedUser.login,
@@ -112,7 +97,7 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
         role: selectedRole
       }];
       setParticipants(updatedParticipantsList);
-      onParticipantsUpdate(updatedParticipantsList); // Уведомляем родителя
+      onParticipantsUpdate(updatedParticipantsList);
       setSelectedUser(null);
       setSearchQuery('');
       setSearchedUsers([]);
@@ -127,7 +112,7 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
 
   const handleRoleChange = async (participantUserId: number, newRole: ProjectRole) => {
     if (!project) return;
-    // Не позволяем менять роль владельца проекта через этот интерфейс
+
     if (participantUserId === project.owner?.id && newRole !== ProjectRole.OWNER) {
         alert("Роль владельца проекта не может быть изменена.");
         return;
@@ -138,7 +123,7 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
     }
 
     const originalParticipants = [...participants];
-    // Оптимистичное обновление
+
     const updatedOptimistic = participants.map(p =>
         p.userId === participantUserId ? { ...p, role: newRole } : p
     );
@@ -146,11 +131,11 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
 
     try {
         await updateUserProjectRoleApi(project.id, participantUserId, newRole);
-        onParticipantsUpdate(updatedOptimistic); // Уведомляем родителя об успешном обновлении
+        onParticipantsUpdate(updatedOptimistic);
     } catch (e: any) {
         console.error('Ошибка изменения роли:', e);
         setError(e.response?.data?.message || e.message || "Не удалось изменить роль.");
-        setParticipants(originalParticipants); // Откат
+        setParticipants(originalParticipants);
     }
   };
 
@@ -161,7 +146,7 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
     }
     if (!window.confirm("Вы уверены, что хотите удалить этого пользователя из проекта?")) return;
 
-    setIsSubmitting(true); // Можно использовать отдельный лоадер для строки
+    setIsSubmitting(true); 
     try {
       await removeUserFromProjectApi(project.id, participantUserId);
       const filteredParticipants = participants.filter(p => p.userId !== participantUserId);
@@ -194,11 +179,11 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
             value={[participant.role]}
             onUpdate={(value) => handleRoleChange(participant.userId, value[0] as ProjectRole)}
             options={Object.values(ProjectRole)
-                .filter(role => role !== ProjectRole.OWNER) // Нельзя назначить OWNER через селект
+                .filter(role => role !== ProjectRole.OWNER)
                 .map(role => ({ value: role, content: role }))
             }
             size="s"
-            disabled={currentUserId !== project?.owner?.id} // Только владелец может менять роли
+            disabled={currentUserId !== project?.owner?.id}
           />
         )}
       </div>
@@ -216,7 +201,6 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
     </div>
   );
   
-  // Только владелец проекта может добавлять новых участников
   const canManageParticipants = currentUserId === project?.owner?.id;
   const valueForSelect = selectedUser ? [selectedUser.login] : [];
 
@@ -240,22 +224,20 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
           <Text variant="subheader-1" className="project-access-modal__add-title">Добавить участника:</Text>
           <Select
             filterable
-            value={valueForSelect} // Передаем массив с одним логином
-            onUpdate={(newValues) => { // newValues будет типа ["some_login"]
+            value={valueForSelect}
+            onUpdate={(newValues) => {
                 const login = newValues[0];
-                console.log('onUpdate - selected login:', login);
                 const user = searchedUsers.find(u => u.login === login);
-                console.log('onUpdate - found user:', user);
                 setSelectedUser(user || null);
             }}
             onFilterChange={setSearchQuery}
-            renderOption={(option) => ( // option.data это UserProfile
+            renderOption={(option) => (
                 <User
                     name={`${option.data?.name || ''} ${option.data?.surname || ''}`.trim()}
                     description={option.data?.login}
                 />
             )}
-            renderSelectedOption={(option) => { // option должен быть полным объектом {value, content, data}
+            renderSelectedOption={(option) => {
                 return <span>{option.value}</span>;
             }}
             options={searchedUsers.map(u => ({ 
@@ -271,7 +253,7 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
             value={[selectedRole]}
             onUpdate={(value) => setSelectedRole(value[0] as ProjectRole)}
             options={Object.values(ProjectRole)
-                .filter(role => role !== ProjectRole.OWNER) // Нельзя назначить OWNER
+                .filter(role => role !== ProjectRole.OWNER)
                 .map(role => ({ value: role, content: role }))
             }
             className="project-access-modal__role-select-new"

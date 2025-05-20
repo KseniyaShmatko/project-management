@@ -1,10 +1,6 @@
-// src/pages/ProjectDashboardPage/ProjectDashboardPage.scss
 .project-dashboard-page {
-    display: flex;
-    height: 100vh; // Занять всю высоту экрана
-    overflow: hidden; // Предотвратить скролл всей страницы, скролл будет внутри панелей
-    background-color: #f8f9fa; // Светлый фон, как в Miro
-  }
-  
-  // Стили для Sidebar и MainArea будут в их собственных SCSS или здесь
-  
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}

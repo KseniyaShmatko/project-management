@@ -1,8 +1,7 @@
-// src/widgets/note-editor/ui/NoteEditorWidget.tsx
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import EditorJsWrapper from './EditorJsWrapper';
 import  EditorJS, { OutputData, BlockToolData, API as EditorJSAPI } from '@editorjs/editorjs';
-import { debounce } from 'lodash-es'; // Убедитесь, что lodash-es установлен
+import { debounce } from 'lodash-es';
 
 import { SuperObject, ContentBlock, EditorJsBlockData } from '../../../shared/api/models';
 import {
@@ -12,23 +11,23 @@ import {
   getAllContentBlocksForSuperObject,
   uploadImageApi
 } from '../../../shared/api/noteApi';
+
 import './NoteEditorWidget.scss';
 
 interface NoteEditorWidgetProps {
-  noteId?: string; // fileId передается как строка
+  noteId?: string; 
   readOnly?: boolean;
 }
 
-interface ImageUploadResult { // Этот тип должен быть совместим с UploadResponseFormat в EditorJsWrapper
+interface ImageUploadResult {
   success: 1 | 0;
   file: { url: string; name?: string; size?: number; [key: string]: any; };
   message?: string;
 }
 
-// Конвертеры (оставляем как есть, если они работали корректно с типами)
 const convertContentBlocksToEditorJsData = (contentBlocksFromDb: ContentBlock[]): OutputData => {
   if (!contentBlocksFromDb || contentBlocksFromDb.length === 0) {
-    return { time: Date.now(), blocks: [{ type: 'paragraph', data: { text: '' } }], version: "2.30.0" }; // Начинаем с пустого параграфа
+    return { time: Date.now(), blocks: [{ type: 'paragraph', data: { text: '' } }], version: "2.30.0" };
   }
   return {
     time: Date.now(),
@@ -42,12 +41,12 @@ const convertContentBlocksToEditorJsData = (contentBlocksFromDb: ContentBlock[])
         blockDataForEditor = { text: '' };
       }
       return {
-        id: dbBlock.id, // Используем ID из БД
+        id: dbBlock.id, 
         type: blockTypeForEditor,
         data: blockDataForEditor,
       };
     }),
-    version: "2.30.0", // Укажите вашу актуальную стабильную версию Editor.js
+    version: "2.30.0",
   };
 };
 
@@ -57,13 +56,13 @@ const convertEditorJsBlocksToPayload = (editorJsBlocks: BlockToolData[]): Editor
     if (!blockType) {
       console.error(`[CONVERT PAYLOAD] Блок ОТ Editor.js НЕ ИМЕЕТ 'type' или 'tool'! Блок:`, ejBlock);
       return {
-        id: ejBlock.id, // Может быть null или undefined, если блок новый и ЕЩЕ не сохранен на сервере
+        id: ejBlock.id,
         type: 'unknown_type_error_client',
         data: ejBlock.data || {},
       };
     }
     return {
-      id: ejBlock.id, // ID блока (может быть сгенерирован клиентом для новых, или серверный для существующих)
+      id: ejBlock.id,
       type: blockType as string,
       data: ejBlock.data,
     };
@@ -73,7 +72,6 @@ const convertEditorJsBlocksToPayload = (editorJsBlocks: BlockToolData[]): Editor
 
 export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, readOnly = false }) => {
   const [currentSuperObject, setCurrentSuperObject] = useState<SuperObject | null>(null);
-  // editorInitialData теперь будет хранить данные, с которыми БЫЛ ИНИЦИАЛИЗИРОВАН редактор
   const [editorInitialDataUsed, setEditorInitialDataUsed] = useState<OutputData | undefined>(undefined);
   
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -83,8 +81,7 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, read
   const currentSuperObjectRefForDebounce = useRef<SuperObject | null>(null);
   const loadingFileIdRef = useRef<number | null>(null);
 
-  // Ref на инстанс EditorJS, чтобы управлять им из родителя, если нужно (например, для render)
-  const editorJsInstanceApiRef = useRef<EditorJSAPI | null>(null); // Или EditorJS, если нужен весь инстанс
+  const editorJsInstanceApiRef = useRef<EditorJSAPI | null>(null);
   const editorJsInstanceRef = useRef<EditorJS | null>(null);
 
 
@@ -93,46 +90,43 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, read
   }, [currentSuperObject]);
 
 
-  // Эффект для загрузки данных или создания нового SuperObject
   useEffect(() => {
     if (!noteId) {
-      // ... (логика сброса состояния, если нет noteId) ...
-      setIsLoading(false); setError('ID заметки не предоставлен.'); setEditorInitialDataUsed(undefined); setCurrentSuperObject(null); loadingFileIdRef.current = null; editorJsInstanceApiRef.current = null;
+      setIsLoading(false); 
+      setError('ID заметки не предоставлен.'); 
+      setEditorInitialDataUsed(undefined); 
+      setCurrentSuperObject(null); 
+      loadingFileIdRef.current = null; 
+      editorJsInstanceApiRef.current = null;
       return;
     }
     const fileId = parseInt(noteId, 10);
     if (isNaN(fileId)) {
-      // ... (логика сброса состояния, если некорректный noteId) ...
-      setIsLoading(false); setError('Некорректный ID заметки.'); setEditorInitialDataUsed(undefined); setCurrentSuperObject(null); loadingFileIdRef.current = null; editorJsInstanceApiRef.current = null;
+      setIsLoading(false); 
+      setError('Некорректный ID заметки.');
+      setEditorInitialDataUsed(undefined); 
+      setCurrentSuperObject(null); 
+      loadingFileIdRef.current = null; 
+      editorJsInstanceApiRef.current = null;
       return;
     }
 
-    console.log(`[LOAD EFFECT ROOT] noteId: ${noteId}, current loadingFileId: ${loadingFileIdRef.current}, isLoading: ${isLoading}`);
-
-    // Если уже идет загрузка для этого fileId, выходим, чтобы избежать гонки.
-    // Это простая проверка, для более сложной логики отмены предыдущего запроса можно использовать AbortController.
     if (loadingFileIdRef.current === fileId && isLoading) {
-        console.log(`[LOAD EFFECT] Загрузка для fileId ${fileId} уже в процессе. Пропускаем.`);
         return;
     }
 
     if (!currentSuperObject || currentSuperObject.fileId !== fileId) {
-        console.log(`[LOAD EFFECT] Смена noteId (${currentSuperObject?.fileId} -> ${fileId}) или первая загрузка.`);
         loadingFileIdRef.current = fileId;
         setIsLoading(true);
         setError(null);
         setCurrentSuperObject(null);
-        setEditorInitialDataUsed(undefined); // Сброс initialData, так как EditorJsWrapper будет перемонтирован по key
+        setEditorInitialDataUsed(undefined);
         latestEditorDataRef.current = null;
         editorJsInstanceApiRef.current = null;
     } else if (isLoading && loadingFileIdRef.current === fileId) {
-        // Загрузка для этого fileId уже идет, выходим
         console.log(`[LOAD EFFECT] Загрузка для fileId ${fileId} уже в процессе (isLoading=true). Пропускаем.`);
         return;
     } else if (!isLoading && currentSuperObject && currentSuperObject.fileId === fileId) {
-        // Данные для этого fileId уже загружены, и мы не в состоянии isLoading.
-        // Это может быть повторный вызов эффекта (например, от StrictMode при разработке)
-        // Ничего не делаем, чтобы не сбросить текущее состояние.
         console.log(`[LOAD EFFECT] Данные для fileId ${fileId} уже загружены. Пропускаем повторный запуск.`);
         return;
     }
@@ -144,7 +138,6 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, read
         return;
       }
       try {
-        console.log(`[LOAD EFFECT] Загрузка/создание для fileId: ${fileId}`);
         let so = await getSuperObjectByMongoId(noteId);
         let blocksFromDb: ContentBlock[] = [];
 
@@ -156,10 +149,6 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, read
             throw new Error('Не удалось создать SuperObject на сервере.');
           }
           so = createdSO;
-          // Для нового SO, блоки будут пустыми (или с дефолтным параграфом, если так решил convert...Data)
-          // Важно: после создания SO и до первого сохранения блоков, они не имеют серверных ID.
-          // Editor.js сам сгенерирует временные ID.
-          // Первый sync отправит их на сервер, и сервер присвоит им постоянные ID.
         } else {
           console.log(`[LOAD EFFECT] SuperObject для fileId ${fileId} найден. Загружаем блоки.`);
           blocksFromDb = await getAllContentBlocksForSuperObject(so);
@@ -167,10 +156,8 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, read
         
         setCurrentSuperObject(so);
         const initialDataForEditor = convertContentBlocksToEditorJsData(blocksFromDb);
-        setEditorInitialDataUsed(initialDataForEditor); // Этот стейт будет использован для initialData пропа
-        latestEditorDataRef.current = initialDataForEditor; // Синхронизируем latest с initial при загрузке
-
-        console.log(`[LOAD EFFECT] Успешно загружены данные для fileId: ${fileId}.`);
+        setEditorInitialDataUsed(initialDataForEditor);
+        latestEditorDataRef.current = initialDataForEditor;
 
       } catch (err: any) {
         console.error(`[LOAD EFFECT] Ошибка при загрузке/создании для fileId ${fileId}:`, err);
@@ -178,8 +165,6 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, read
       } finally {
         if (loadingFileIdRef.current === fileId) {
           setIsLoading(false);
-          // Не сбрасываем loadingFileIdRef.current = null здесь, чтобы следующий useEffect для того же noteId не сработал,
-          // если он не должен (например, при hot reload)
         }
       }
 
@@ -189,85 +174,43 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, read
       loadOrCreateNote();
     }
     
-    // Функция очистки не нужна для AbortController здесь, 
-    // так как мы управляем через loadingFileIdRef и isLoading.
-    // Если бы использовали AbortController, здесь была бы отмена.
-
-  }, [noteId]); // Зависимость только от noteId
+  }, [noteId]);
 
   const uploaderObject = useMemo(() => {
     return {
-      uploadByFile: async (file: File): Promise<ImageUploadResult> => { // Возвращаемый тип ImageUploadResult
-        console.log('[ImageUploader] Вызов uploadImageApi для файла:', file.name);
-        // Вызываем нашу API-функцию
+      uploadByFile: async (file: File): Promise<ImageUploadResult> => {
         const result = await uploadImageApi(file); 
-        
-        // uploadImageApi уже должен возвращать объект в формате ImageUploadResult
-        // (или ApiUploadResponse, который совместим)
-        console.log('[ImageUploader] Ответ от uploadImageApi:', result);
-
-        // ВАЖНО: Обработка URL, если бэкенд возвращает относительный URL
         if (result.success === 1 && result.file && result.file.url) {
-          // Если ваш apiClient НЕ настроен на бэкенд, работающий на том же origin + port,
-          // что и ваш dev-сервер (например, если baseURL у apiClient это 'http://localhost:8080',
-          // а ваш фронтенд на 'http://localhost:3000'), и бэкенд возвращает относительный URL (например, '/uploads/...'),
-          // то этот относительный URL будет пытаться загрузиться с 'http://localhost:3000/uploads/...', что неверно.
-          //
-          // В идеале, ваш `apiClient.baseURL` уже правильный (`http://localhost:8080`),
-          // и бэкенд (FileStorageService) возвращает ПОЛНЫЙ URL (схема+хост+порт+путь).
-          // Если же бэкенд упорно возвращает относительный URL типа "/uploads/image.png",
-          // а baseURL в apiClient "http://localhost:8080", то URL для картинки ДОЛЖЕН быть
-          // "http://localhost:8080/uploads/image.png".
-          //
-          // Проверьте, какой URL фактически приходит в result.file.url.
-          // Если он УЖЕ полный (начинается с http://localhost:8080), то ничего делать не надо.
-          // Если он относительный (/uploads/...), то его надо "дополнить".
-          
-          // Пример дополнения, если бэкенд вернул ОТНОСИТЕЛЬНЫЙ URL:
-          // const backendBaseUrl = 'http://localhost:8080'; // Из конфига или apiClient.defaults.baseURL
-          // if (result.file.url.startsWith('/')) {
-          //   result.file.url = `${backendBaseUrl}${result.file.url}`;
-          // }
         }
-        return result; // uploadImageApi уже должен вернуть правильный формат
+        return result;
       },
-      // uploadByUrl: async (url: string) => { /* ... */ }
     };
   }, []);
 
-  // Debounced функция сохранения
   const debouncedSave = useCallback(
     debounce(async () => {
       const soToSave = currentSuperObjectRefForDebounce.current;
       const editorDataToSave = latestEditorDataRef.current;
 
-      // ... (проверки soToSave, editorDataToSave) ...
       if (!soToSave || !soToSave.id || !editorDataToSave ) {
         console.log('[DEBOUNCED SAVE] Нет SO, ID или данных для сохранения.', { soToSave, editorDataToSave });
         return; 
       }
-      // Если блоков нет, все равно сохраняем (пустой массив)
+
       if (editorDataToSave.blocks.length === 0) {
         console.log('[DEBOUNCED SAVE] Сохранение пустого массива блоков.');
       }
 
-
-      console.log('[DEBOUNCED SAVE] Попытка сохранить для SO ID:', soToSave.id);
       const payload = convertEditorJsBlocksToPayload(editorDataToSave.blocks);
       
       try {
         const updatedSOFromServer = await syncDocumentBlocksApi(soToSave.id, payload);
-        console.log('[DEBOUNCED SAVE] Сервер ответил:', updatedSOFromServer);
 
-        // Аккуратно обновляем СТЕЙТ currentSuperObject, чтобы не вызывать лишних перерисовок Wrapper'а
-        // если ID не изменился.
         setCurrentSuperObject(prevSO => {
           if (prevSO && prevSO.id === updatedSOFromServer.id) {
-            // Сравните только те поля, которые действительно могли измениться и важны для UI вне редактора
-            // (name, lastChangeDate и т.д.). Не создавайте новый объект, если ничего не изменилось.
             const importantFieldsChanged = 
                 prevSO.name !== updatedSOFromServer.name ||
-                prevSO.lastChangeDate !== updatedSOFromServer.lastChangeDate || // Если это поле важно для UI
+                prevSO.lastChangeDate !== updatedSOFromServer.lastChangeDate ||
                 prevSO.firstItem !== updatedSOFromServer.firstItem ||
                 prevSO.lastItem !== updatedSOFromServer.lastItem;
 
@@ -276,22 +219,11 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, read
               return { ...prevSO, ...updatedSOFromServer };
             } else {
               console.log("[DEBOUNCED SAVE] Стейт currentSuperObject не требует обновления (важные поля не изменились).");
-              // ВАЖНО: Если сервер вернул новые ID для блоков, то `latestEditorDataRef.current`
-              // все еще содержит старые (клиентские) ID. Это может быть проблемой при следующем save.
-              // Идеально, если `syncDocumentBlocksApi` возвращает `OutputData` с серверными ID
-              // и мы обновляем `latestEditorDataRef.current = newOutputDataFromServer;`
-              // А затем, если нужно, делаем `editorJsInstanceApiRef.current?.render(newOutputDataFromServer);`
-              // НО! Это очень опасно и может сбросить фокус/каретку.
-              // Лучше, если ID блоков не меняются после первого сохранения, а только создаются для новых.
-              return prevSO; // Возвращаем предыдущий объект, чтобы не триггерить React
+              return prevSO;
             }
           }
-          return prevSO; // Если что-то пошло не так с ID
+          return prevSO;
         });
-        
-        // НЕ ДЕЛАЕМ: setEditorInitialDataUsed(...) - это вызовет откат!
-        // НЕ ДЕЛАЕМ: getAllContentBlocksForSuperObject(...) - редактор - источник правды!
-
       } catch (e: any) {
         console.error('[DEBOUNCED SAVE] Ошибка синхронизации:', e);
         setError(`Ошибка сохранения: ${e.message || 'Неизвестная ошибка'}`);
@@ -305,11 +237,8 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, read
     debouncedSave();
   }, [debouncedSave]);
 
-  const handleEditorReady = useCallback((editor: EditorJS) => { // Изменил параметр на editor
-    editorJsInstanceRef.current = editor; // Сохраняем API или весь editor
-    console.log("[NOTE EDITOR WIDGET] EditorJsWrapper готов.");
-    // При первой готовности редактора, его данные (initialData) должны быть в latestEditorDataRef
-    // Это сделано в useEffect загрузки.
+  const handleEditorReady = useCallback((editor: EditorJS) => {
+    editorJsInstanceRef.current = editor;
   }, []);
 
 
@@ -322,9 +251,9 @@ export const NoteEditorWidget: React.FC<NoteEditorWidgetProps> = ({ noteId, read
     <div className="note-editor-widget-container">
       {currentSuperObject.name && <h1>{currentSuperObject.name}</h1>}
       <EditorJsWrapper
-        key={currentSuperObject.id.toString()} // Ключ для перемонтирования при смене SO ID
+        key={currentSuperObject.id.toString()}
         holderId={`editorjs-holder-${currentSuperObject.id}`}
-        initialData={editorInitialDataUsed} // Только для ПЕРВОЙ инициализации этого инстанса
+        initialData={editorInitialDataUsed}
         onChange={handleEditorChange}
         onReady={handleEditorReady}
         readOnly={readOnly}

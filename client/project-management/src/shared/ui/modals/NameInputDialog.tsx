@@ -1,4 +1,3 @@
-// src/shared/ui/modals/NameInputDialog.tsx
 import React, { useState, useEffect } from 'react';
 import { Modal, TextInput, Button, Text } from '@gravity-ui/uikit';
 import './NameInputDialog.scss';

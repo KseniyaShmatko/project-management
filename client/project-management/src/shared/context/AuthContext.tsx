@@ -1,5 +1,5 @@
-// src/shared/context/AuthContext.tsx
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+
 import { UserProfile } from '../api/models';
 import { getAuthToken, setAuthToken as apiSetAuthToken, getCurrentUserApi, logoutUser as apiLogoutUser } from '../api/noteApi';
 
@@ -9,7 +9,6 @@ interface AuthContextType {
   isLoading: boolean;
   login: (token: string, userData: UserProfile) => void;
   logout: () => void;
-  // setUserData: (userData: UserProfile | null) => void; // Если нужно обновлять данные пользователя отдельно
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

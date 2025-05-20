@@ -1,4 +1,3 @@
-// src/entities/FileGrid/FileGrid.tsx
 import React from 'react';
 import { Text } from '@gravity-ui/uikit';
 

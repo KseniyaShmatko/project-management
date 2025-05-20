@@ -1,13 +1,12 @@
-// src/pages/auth/LoginPage.tsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TextInput, Button, Text } from '@gravity-ui/uikit';
 
-import { loginUserApi, setAuthToken } from '../../shared/api/noteApi'; // Импортируем API
-import { UserProfile } from '../../shared/api/models'; // Для установки токена
+import { loginUserApi } from '../../shared/api/noteApi';
+import { UserProfile } from '../../shared/api/models';
 import { useAuth } from '../../shared/context/AuthContext';
 
-import './AuthPage.scss'; // Общие стили для страниц Auth
+import './AuthPage.scss';
 
 const LoginPage: React.FC = () => {
   const [login, setLogin] = useState('');
@@ -23,21 +22,16 @@ const LoginPage: React.FC = () => {
     setError(null);
     try {
       const authResponse = await loginUserApi({ login, password });
-      // authResponse содержит { token, id, login, name, surname, photo }
-      const userProfile: UserProfile = { // Формируем UserProfile из AuthResponse
+      const userProfile: UserProfile = {
         id: authResponse.id,
         login: authResponse.login,
         name: authResponse.name,
         surname: authResponse.surname,
         photo: authResponse.photo,
       };
-      authLogin(authResponse.token, userProfile); // Вызываем login из AuthContext
-      // loginUserApi уже вызвал setAuthToken, так что можно было бы не передавать токен в authLogin,
-      // а чтобы authLogin сам его брал или доверял, что он уже установлен.
-      // Но для явности передаем.
+      authLogin(authResponse.token, userProfile);
       navigate('/projects'); 
     } catch (err: any) {
-      // ... обработка ошибок ...
     } finally {
       setIsLoading(false);
     }

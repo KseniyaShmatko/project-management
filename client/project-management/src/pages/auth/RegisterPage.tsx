@@ -1,8 +1,9 @@
-// src/pages/auth/RegisterPage.tsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { TextInput, Button, Text } from '@gravity-ui/uikit';
+
 import { registerUserApi } from '../../shared/api/noteApi';
+
 import './AuthPage.scss';
 
 const RegisterPage: React.FC = () => {
@@ -10,7 +11,7 @@ const RegisterPage: React.FC = () => {
   const [surname, setSurname] = useState('');
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const [photo, setPhoto] = useState(''); // Опционально
+  const [photo, setPhoto] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const RegisterPage: React.FC = () => {
     try {
       await registerUserApi({ name, surname, login, password, photo: photo || null });
       alert('Регистрация успешна! Теперь вы можете войти.');
-      navigate('/login'); // Перенаправляем на страницу входа
+      navigate('/login');
     } catch (err: any) {
       console.error("Ошибка регистрации:", err);
       setError(err.response?.data?.message || err.response?.data || err.message || 'Ошибка регистрации');

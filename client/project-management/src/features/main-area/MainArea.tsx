@@ -1,4 +1,3 @@
-// src/features/main-area/MainArea.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, Text, Loader, TextInput, Icon } from '@gravity-ui/uikit';
 import { Plus, Pencil, Gear } from '@gravity-ui/icons';
@@ -140,7 +139,6 @@ const MainArea: React.FC<MainAreaProps> = ({
                 {isOwner && (
                     <Button view="outlined" size="l" onClick={onOpenAccessModal} title="Управление доступом">
                         <Icon data={Gear} />
-                        {/* Доступ */}
                     </Button>
                 )}
             </div>
