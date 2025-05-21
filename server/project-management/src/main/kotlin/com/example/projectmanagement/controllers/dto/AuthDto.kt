@@ -1,4 +1,3 @@
-// src/main/kotlin/com/example/projectmanagement/controllers/dto/AuthDto.kt
 package com.example.projectmanagement.controllers.dto
 
 data class LoginRequest(

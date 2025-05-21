@@ -9,24 +9,24 @@ import jakarta.persistence.Table
 @NamedEntityGraph(
     name = "Project.withDetails",
     attributeNodes = [
-        NamedAttributeNode("owner"), // Загружаем владельца
-        NamedAttributeNode(value = "projectUsers", subgraph = "projectUsers-subgraph"), // Загружаем участников и их пользователей
-        NamedAttributeNode(value = "projectFiles", subgraph = "projectFiles-subgraph")  // Загружаем файлы проекта и их детали
+        NamedAttributeNode("owner"),
+        NamedAttributeNode(value = "projectUsers", subgraph = "projectUsers-subgraph"),
+        NamedAttributeNode(value = "projectFiles", subgraph = "projectFiles-subgraph")
     ],
     subgraphs = [
         NamedSubgraph(
             name = "projectUsers-subgraph",
-            attributeNodes = [NamedAttributeNode("user")] // Внутри ProjectUser загружаем User
+            attributeNodes = [NamedAttributeNode("user")]
         ),
         NamedSubgraph(
             name = "projectFiles-subgraph",
             attributeNodes = [
-                NamedAttributeNode(value = "file", subgraph = "file-subgraph") // Внутри ProjectFile загружаем File
+                NamedAttributeNode(value = "file", subgraph = "file-subgraph")
             ]
         ),
-        NamedSubgraph( // Отдельный субграф для деталей File, так как он используется в projectFiles-subgraph
+        NamedSubgraph(
             name = "file-subgraph",
-            attributeNodes = [NamedAttributeNode("type")] // Внутри File загружаем FileType
+            attributeNodes = [NamedAttributeNode("type")]
         )
     ]
 )
@@ -52,20 +52,11 @@ data class Project(
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
         other as Project
-        // Если id == 0, то это новая, еще не сохраненная сущность.
-        // Сравнивать новые сущности по id (который 0) не имеет смысла,
-        // они будут равны только если это один и тот же объект (this === other).
-        // Если id != 0, то это уже сохраненная сущность, и ее можно сравнивать по id.
         return if (id == 0L) false else id == other.id
     }
 
     override fun hashCode(): Int {
-        // Используем id для хэш-кода, если он не 0.
-        // Для новых сущностей (id == 0), можно вернуть константу или this.javaClass.hashCode(),
-        // чтобы избежать коллизий, если они добавляются в Set до сохранения.
         return if (id != 0L) id.hashCode() else System.identityHashCode(this)
-        // Или просто:
-        // return id.hashCode() // Если уверены, что в Set/Map попадают только сохраненные сущности
     }
 
     override fun toString(): String {

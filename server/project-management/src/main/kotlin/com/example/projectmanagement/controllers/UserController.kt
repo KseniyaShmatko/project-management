@@ -12,10 +12,6 @@ class UserController(private val userService: UserService) {
 
     @GetMapping("/search")
     fun searchUsersByLogin(@RequestParam("login") loginQuery: String): ResponseEntity<List<UserResponseDto>> {
-        // Исключаем текущего пользователя из результатов поиска, если нужно
-        // val currentUser = SecurityContextHolder.getContext().authentication.principal as User
-        // val users = userService.searchUsersByLogin(loginQuery).filter { it.id != currentUser.id }
-
         val users = userService.searchUsersByLogin(loginQuery)
         return ResponseEntity.ok(users)
     }

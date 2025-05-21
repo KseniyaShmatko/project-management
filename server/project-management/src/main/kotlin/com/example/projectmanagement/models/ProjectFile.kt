@@ -8,11 +8,11 @@ data class ProjectFile(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @ManyToOne(fetch = FetchType.LAZY) // FetchType.LAZY здесь обычно по умолчанию для @ManyToOne, но лучше указать явно.
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     val project: Project,
 
-    @ManyToOne(fetch = FetchType.LAZY) // Аналогично
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id", nullable = false)
     val file: File
 ) {

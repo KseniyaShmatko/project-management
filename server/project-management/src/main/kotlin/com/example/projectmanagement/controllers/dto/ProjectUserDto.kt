@@ -10,17 +10,16 @@ data class ProjectUserDto(
 )
 
 data class ProjectUserView(
-    val id: Long, // ID самой связи ProjectUser
+    val id: Long,
     val projectId: Long,
     val userId: Long,
-    val userLogin: String, // Добавим для удобства фронтенда
-    val userName: String?,  // Добавим для удобства фронтенда
-    val userSurname: String?,// Добавим для удобства фронтенда
-    val userPhoto: String?, // Добавим для удобства фронтенда
+    val userLogin: String,
+    val userName: String?,
+    val userSurname: String?,
+    val userPhoto: String?,
     val role: ProjectRole
 )
 
-// Можно добавить маппер в сервисе или прямо тут
 fun ProjectUser.toView(): ProjectUserView {
     return ProjectUserView(
         id = this.id,

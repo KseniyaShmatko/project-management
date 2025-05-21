@@ -33,13 +33,10 @@ class ProjectUserService(
         val project = projectRepository.findById(projectId)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found") }
 
-        // Владелец проекта может управлять участниками
         if (project.owner?.id == manager.id) return
 
-        // Или участник с ролью OWNER (если используется явная запись для владельца)
-        // или в будущем, если появится роль типа PROJECT_ADMIN
         val managerLink = projectUserRepository.findByProject_IdAndUser_Id(projectId, manager.id)
-        if (managerLink?.role != ProjectRole.OWNER) { // Пока только OWNER может управлять этим
+        if (managerLink?.role != ProjectRole.OWNER) {
             throw AccessDeniedException("User does not have permission to manage users for this project")
         }
     }
@@ -75,8 +72,6 @@ class ProjectUserService(
         )
     }
     
-    // Используется для добавления владельца как участника при создании проекта
-    // Вызывается из ProjectService
     @Transactional
     fun addOwnerAsProjectUser(projectId: Long, ownerId: Long): ProjectUser {
          val project = projectRepository.findById(projectId)
@@ -91,11 +86,9 @@ class ProjectUserService(
 
 
     fun getProjectsForUser(userId: Long): List<ProjectUser> =
-        projectUserRepository.findAllByUser_Id(userId) // Здесь user.id - это ID пользователя, для которого ищем проекты
+        projectUserRepository.findAllByUser_Id(userId)
 
     fun getUsersForProject(projectId: Long): List<ProjectUser> {
-        // Можно добавить проверку, что текущий пользователь имеет право видеть участников этого проекта
-        // Например, он должен быть владельцем или участником этого проекта
         val currentUser = getCurrentUser()
         projectRepository.findById(projectId).orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found") }
         

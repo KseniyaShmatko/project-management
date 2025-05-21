@@ -1,4 +1,3 @@
-// diploma/server/project-management/src/main/kotlin/com/example/projectmanagement/models/User.kt
 package com.example.projectmanagement.models
 
 import jakarta.persistence.*
@@ -15,29 +14,18 @@ data class User(
     var name: String,
     var surname: String,
 
-    // Это поле будет использоваться UserRepository.findByLogin()
-    // и будет возвращаться методом getUsername()
     @Column(unique = true, nullable = false)
     var login: String,
 
-    // Переименовываем поле, чтобы избежать конфликта с методом getPassword()
     @Column(nullable = false)
     var passwordInternal: String,
 
     var photo: String? = null,
 
-    // Переименовываем поля для UserDetails boolean-флагов
     var enabledInternal: Boolean = true,
     var accountNonExpiredInternal: Boolean = true,
     var accountNonLockedInternal: Boolean = true,
     var credentialsNonExpiredInternal: Boolean = true
-
-    // Важно: убедитесь, что ваш build.gradle.kts сконфигурирован для плагина kotlin-jpa
-    // (обычно через allOpen { annotation("jakarta.persistence.Entity") }).
-    // Этот плагин генерирует конструктор без аргументов для JPA-сущностей.
-    // Если плагина нет или он настроен неверно, JPA может потребовать явный конструктор без аргументов:
-    // constructor() : this(0, "", "", "", "", null, true, true, true, true) // Пример
-
 ) : UserDetails {
 
     override fun getAuthorities(): Collection<GrantedAuthority> = emptyList()

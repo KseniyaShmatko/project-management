@@ -2,8 +2,8 @@ package com.example.projectmanagement.services
 
 import com.example.projectmanagement.controllers.dto.*
 import com.example.projectmanagement.models.*
-import com.example.projectmanagement.repositories.mongo.SuperObjectRepository // Если используется
-import com.example.projectmanagement.repositories.* // Все репозитории
+import com.example.projectmanagement.repositories.mongo.SuperObjectRepository
+import com.example.projectmanagement.repositories.*
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
@@ -22,16 +22,15 @@ class ProjectFileService(
     private val projectFileRepository: ProjectFileRepository,
     private val projectRepository: ProjectRepository,
     private val fileRepository: FileRepository,
-    private val fileTypeRepository: FileTypeRepository, // Добавить
-    private val userRepository: UserRepository,         // Добавить
-    private val projectService: ProjectService,         // Для checkAccessToProject
-    private val superObjectRepository: SuperObjectRepository? = null // Сделал nullable на всякий
-    // @Value("\${file.upload-dir}") private val uploadDir: String // Путь для загрузки файлов
+    private val fileTypeRepository: FileTypeRepository,
+    private val userRepository: UserRepository, 
+    private val projectService: ProjectService,
+    private val superObjectRepository: SuperObjectRepository? = null
 ) {
-    private val uploadDir = "uploads" // Захардкодим пока, лучше из properties
+    private val uploadDir = "uploads"
 
     init {
-        Files.createDirectories(Paths.get(uploadDir)) // Создаем директорию, если нет
+        Files.createDirectories(Paths.get(uploadDir))
     }
 
     private fun getCurrentUser(): User {
@@ -47,7 +46,6 @@ class ProjectFileService(
 
 
     private fun File.toProjectFileResponseDto(): ProjectFileResponseDto {
-        // Hibernate.initialize(this.type) - Уже есть в File.toResponseDto, но здесь мы преобразуем File, а не ProjectFile
         val fileTypeDto = this.type?.let { ft -> FileTypeResponseDto(id = ft.id, name = ft.name) }
             ?: throw IllegalStateException("FileType is null for file ${this.id}")
 
@@ -58,8 +56,6 @@ class ProjectFileService(
             authorId = this.authorId,
             date = this.uploadDate.toString(),
             superObjectId = this.superObjectId
-            // filePath здесь не нужен, если вы не отдаете его на фронт для прямого доступа,
-            // а используете отдельный эндпоинт для скачивания
         )
     }
 
@@ -74,18 +70,17 @@ class ProjectFileService(
         val fileType = fileTypeRepository.findById(typeId)
             .orElseThrow { ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type") }
 
-        // Логика сохранения файла на диск
         val originalFilename = multipartFile.originalFilename ?: "file_${UUID.randomUUID()}"
         val filename = "${UUID.randomUUID()}_${originalFilename.replace("\\s+", "_")}"
         val targetLocation = Paths.get(uploadDir).resolve(filename)
         Files.copy(multipartFile.inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING)
 
         val fileEntity = File(
-            name = originalFilename, // или имя, переданное клиентом
+            name = originalFilename,
             type = fileType,
             authorId = currentUser.id,
             uploadDate = LocalDateTime.now(),
-            filePath = targetLocation.toString() // Сохраняем относительный или абсолютный путь
+            filePath = targetLocation.toString()
         )
         val savedFile = fileRepository.save(fileEntity)
 
@@ -105,10 +100,7 @@ class ProjectFileService(
         val file = fileRepository.findById(fileId)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "File to link not found") }
 
-        // Доп. проверка: может ли currentUser "делиться" этим файлом? (например, он автор)
         if (file.authorId != currentUser.id) {
-             // Или если файл публичный, или другая логика
-            // throw ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the author of this file to link it.")
         }
         
         if (projectFileRepository.existsByProject_IdAndFile_Id(projectId, fileId)) {
@@ -126,9 +118,8 @@ class ProjectFileService(
 
         val projectFiles = projectFileRepository.findAllByProject_Id(projectId)
         return projectFiles.map { pf ->
-            // pf.file должен быть загружен (по умолчанию EAGER для @ManyToOne, если LAZY - нужна инициализация)
-            Hibernate.initialize(pf.file) // если LAZY
-            Hibernate.initialize(pf.file.type) // если LAZY
+            Hibernate.initialize(pf.file)
+            Hibernate.initialize(pf.file.type)
             pf.file.toProjectFileResponseDto()
         }
     }
@@ -183,17 +174,5 @@ class ProjectFileService(
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "File is not linked to this project.")
         
         projectFileRepository.delete(projectFile)
-
-        // Опционально: если файл больше нигде не используется и был создан только для этого проекта, удалить его
-        // val fileUsageCount = projectFileRepository.countByFile_Id(fileId)
-        // if (fileUsageCount == 0) {
-        //     // Удалить файл с диска
-        //     // fileRepository.deleteById(fileId)
-        // }
     }
-
-
-    // Старые методы, которые были в вашем ProjectFileService, возможно, нужно будет адаптировать или удалить,
-    // если новый контроллер покрывает их функциональность с проверками прав.
-    // fun getFilesForProject(projectId: Long): List<File> - вероятно, заменяется на getFilesForProjectWithDetails
 }

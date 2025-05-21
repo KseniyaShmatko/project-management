@@ -26,7 +26,6 @@ class ProjectController(private val projectService: ProjectService) {
         return ResponseEntity.ok(projectService.getProjectById(project_id))
     }
 
-    // Аналогично createProject, если update: Project - это сущность
     @PutMapping("/{project_id}")
     fun updateProject(@PathVariable project_id: Long, @RequestBody update: Project): ResponseEntity<ProjectResponseDto> {
         return ResponseEntity.ok(projectService.updateProject(project_id, update))

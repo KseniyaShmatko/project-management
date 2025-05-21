@@ -14,8 +14,6 @@ class JacksonConfig {
     @Primary
     fun objectMapper(): ObjectMapper {
         val mapper = ObjectMapper()
-        
-        // Добавляем поддержку Kotlin data classes
         mapper.registerModule(KotlinModule.Builder().build())
         
         mapper.registerModule(JavaTimeModule())

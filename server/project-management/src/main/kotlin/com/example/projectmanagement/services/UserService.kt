@@ -39,8 +39,6 @@ class UserService(private val userRepository: UserRepository) {
     private fun User.toUserResponseDto(): UserResponseDto = UserResponseDto(this.id, this.name, this.surname, this.login, this.photo)
 
     fun searchUsersByLogin(loginQuery: String): List<UserResponseDto> {
-        // Предполагаем, что в UserRepository есть метод, например:
-        // fun findByLoginContainingIgnoreCase(login: String): List<User>
         return userRepository.findByLoginContainingIgnoreCase(loginQuery)
             .map { it.toUserResponseDto() }
     }

@@ -17,12 +17,8 @@ class JwtTokenFilter(private val jwtTokenProvider: JwtTokenProvider) : GenericFi
                 SecurityContextHolder.getContext().authentication = auth
             }
         } catch (e: Exception) {
-            // Здесь можно логировать ошибки валидации токена или обработки, 
-            // но обычно SecurityConfig.exceptionHandling().authenticationEntryPoint() лучше для отправки 401
-            SecurityContextHolder.clearContext() // Очищаем контекст, если токен невалиден
-            // res.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.message) // Не рекомендуется здесь
-                                                                             // лучше настроить AuthenticationEntryPoint
-            println("JWT Token Filter Error: ${e.message}") // Для отладки
+            SecurityContextHolder.clearContext()
+            println("JWT Token Filter Error: ${e.message}")
         }
         filterChain.doFilter(req, res)
     }

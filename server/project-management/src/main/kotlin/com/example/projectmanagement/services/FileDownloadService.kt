@@ -13,7 +13,7 @@ import org.springframework.core.io.Resource
 
 @Service
 class FileDownloadService(
-    private val projectService: ProjectService, // Для checkAccessToProject
+    private val projectService: ProjectService,
     private val projectFileRepository: ProjectFileRepository,
     private val fileRepository: FileRepository // Нужен для получения File entity с filePath
 ) {
@@ -36,7 +36,7 @@ class FileDownloadService(
         val projectFile = projectFileRepository.findByProject_IdAndFile_Id(projectId, fileId)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "File not found in this project.")
 
-        val fileEntity = fileRepository.findById(projectFile.file.id) // fileEntity из связи может быть прокси
+        val fileEntity = fileRepository.findById(projectFile.file.id)
              .orElseThrow{ ResponseStatusException(HttpStatus.NOT_FOUND, "File data not found.") }
 
 

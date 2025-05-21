@@ -15,10 +15,8 @@ data class FileResponseDto(
     val filePath: String?
 )
 
-// Функция преобразования
 fun File.toResponseDto(): FileResponseDto {
     val type = if (this.type != null) {
-        // Инициализация lazy-loaded поля
         Hibernate.initialize(this.type)
         this.type
     } else null

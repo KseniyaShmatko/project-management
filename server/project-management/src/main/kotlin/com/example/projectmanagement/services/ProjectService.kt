@@ -1,13 +1,10 @@
-// src/main/kotlin/com/example/projectmanagement/services/ProjectService.kt
 package com.example.projectmanagement.services
 
-import com.example.projectmanagement.controllers.dto.* // Импортируем все DTO из пакета
-import com.example.projectmanagement.models.* // Импортируем все модели
+import com.example.projectmanagement.controllers.dto.*
+import com.example.projectmanagement.models.* 
 import com.example.projectmanagement.repositories.ProjectRepository
 import com.example.projectmanagement.repositories.ProjectUserRepository
 import com.example.projectmanagement.services.ProjectUserService
-// Предположим, у вас есть ProjectFileRepository для загрузки деталей файлов, если они не грузятся вместе с Project
-// import com.example.projectmanagement.repositories.ProjectFileRepository 
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -37,9 +34,8 @@ class ProjectService(
 
     fun projectToProjectResponseDto(project: Project, currentUser: User): ProjectResponseDto {
         val participantsList = project.projectUsers.map { pu ->
-            // Убедимся, что pu.user не LAZY или инициализирован, если нужен
             ProjectParticipantDto(
-                userId = pu.user.id, // pu.user должен быть загружен через JOIN FETCH
+                userId = pu.user.id,
                 login = pu.user.login,
                 name = pu.user.name,
                 surname = pu.user.surname,
@@ -54,7 +50,6 @@ class ProjectService(
             project.projectUsers.find { it.user.id == currentUser.id }?.role
         }
         
-        // Убедимся, что project.owner не LAZY (загружен через JOIN FETCH)
         val ownerDto = project.owner?.toUserResponseDto() 
 
         return ProjectResponseDto(
@@ -63,7 +58,6 @@ class ProjectService(
             description = project.description,
             owner = ownerDto,
             projectFiles = project.projectFiles.mapNotNull { 
-                // it.file и it.file.type должны быть загружены через JOIN FETCH
                 it.toProjectFileResponseDto() 
             },
             participants = participantsList,
@@ -71,7 +65,6 @@ class ProjectService(
         )
     }
 
-    // --- Функции-мапперы в DTO ---
     private fun User.toUserResponseDto(): UserResponseDto {
         return UserResponseDto(
             id = this.id,
@@ -90,16 +83,15 @@ class ProjectService(
     }
     
     private fun ProjectFile.toProjectFileResponseDto(): ProjectFileResponseDto {
-        // this.file и this.file.type уже должны быть загружены через JOIN FETCH
         if (this.file.type == null) throw IllegalStateException("FileType entity is null for File id ${this.file.id}")
 
         return ProjectFileResponseDto(
-            id = this.file.id, // Обычно ID самого файла, а не ProjectFile
+            id = this.file.id,
             name = this.file.name,
-            type = this.file.type!!.toFileTypeResponseDto(), // this.file.type должен быть НЕ NULL
-            authorId = this.file.authorId, // Предполагается, что у File есть authorId
-            date = this.file.uploadDate.toString(), // Преобразуем дату в строку (формат можно настроить)
-            superObjectId = this.file.superObjectId // Если у File есть это поле
+            type = this.file.type!!.toFileTypeResponseDto(),
+            authorId = this.file.authorId,
+            date = this.file.uploadDate.toString(), 
+            superObjectId = this.file.superObjectId
         )
     }
 
@@ -107,10 +99,8 @@ class ProjectService(
     fun createProject(projectRequest: Project): ProjectResponseDto {
         val currentUser = getCurrentUser()
         projectRequest.owner = currentUser
-        val savedProject = projectRepository.save(projectRequest) // Сначала сохраняем
-        projectUserService.addOwnerAsProjectUser(savedProject.id, currentUser.id) // Затем добавляем участника
-
-        // Для возврата полного DTO, загружаем его с деталями
+        val savedProject = projectRepository.save(projectRequest)
+        projectUserService.addOwnerAsProjectUser(savedProject.id, currentUser.id)
         val detailedProject = projectRepository.findProjectByIdWithDetails(savedProject.id)
             .orElseThrow { ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to reload project after creation") }
         return projectToProjectResponseDto(detailedProject, currentUser)
@@ -130,10 +120,7 @@ class ProjectService(
             }
         }
         
-        // Пока закомментируем ownedProjects для чистоты эксперимента, если currentUser не владелец
-        // val ownedProjects = projectRepository.findOwnedProjectsByUserIdWithDetails(currentUser.id)
-        // val allProjects = (ownedProjects + participatedProjects).distinctBy { it.id }
-        val allProjects = participatedProjects.distinctBy { it.id } // Для Боба это должно быть эквивалентно
+        val allProjects = participatedProjects.distinctBy { it.id }
         
         return allProjects.map { project ->
             println("Mapping project ID: ${project.id} for DTO")
@@ -145,10 +132,8 @@ class ProjectService(
     @Transactional(readOnly = true)
     fun getProjectById(projectId: Long): ProjectResponseDto {
         val currentUser = getCurrentUser()
-        // Сначала проверяем доступ (использует projectUserRepository, это нормально)
         checkAccessToProject(projectId, currentUser.id, listOf(ProjectRole.VIEWER, ProjectRole.EDITOR, ProjectRole.OWNER))
         
-        // Затем загружаем проект со всеми деталями
         val project = projectRepository.findProjectByIdWithDetails(projectId)
             .orElseThrow { NoSuchElementException("Project not found with id: $projectId") }
             
@@ -160,15 +145,13 @@ class ProjectService(
         val currentUser = getCurrentUser()
         checkAccessToProject(projectId, currentUser.id, listOf(ProjectRole.EDITOR, ProjectRole.OWNER))
 
-        // Загружаем существующую сущность (без деталей, только для обновления полей самого проекта)
         val projectEntity = projectRepository.findById(projectId)
             .orElseThrow { NoSuchElementException("Project not found with id: $projectId") }
 
         projectEntity.name = updateData.name
         projectEntity.description = updateData.description
-        projectRepository.save(projectEntity) // Сохраняем изменения
+        projectRepository.save(projectEntity)
 
-        // Для возврата полного DTO, загружаем его с деталями
         val detailedProject = projectRepository.findProjectByIdWithDetails(projectEntity.id)
              .orElseThrow { ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to reload project after update") }
         return projectToProjectResponseDto(detailedProject, currentUser)
@@ -177,14 +160,11 @@ class ProjectService(
 
     @Transactional
     fun deleteProject(projectId: Long) {
-        val projectEntity = projectRepository.findById(projectId) // Загружаем сущность для проверки
+        val projectEntity = projectRepository.findById(projectId)
             .orElseThrow { NoSuchElementException("Project not found with id: $projectId") }
         
         val currentUser = getCurrentUser()
         checkAccessToProject(projectId, currentUser.id, ProjectRole.OWNER)
-        // if (projectEntity.owner?.id != currentUser.id) { // Проверяем доступ по сущности
-        //     throw AccessDeniedException("User does not have access to this project")
-        // }
         projectRepository.deleteById(projectEntity.id)
     }
 
@@ -192,18 +172,10 @@ class ProjectService(
         val project = projectRepository.findById(projectId)
             .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found") }
 
-        // 1. Проверяем, является ли пользователь владельцем проекта
         if (project.owner?.id == userId) {
-            // Владелец всегда имеет доступ, независимо от `requiredRoles` если не указано обратного
-            // (например, если для какой-то операции даже OWNER должен иметь явную роль EDITOR).
-            // Для большинства случаев, если `ProjectRole.OWNER` есть в `requiredRoles` или подразумевается, этого достаточно.
             if (requiredRoles.contains(ProjectRole.OWNER)) return
-            // Если OWNER не в requiredRoles, но мы считаем что он всегда имеет права, то return.
-            // Если OWNER может быть ограничен, то нужна более сложная логика.
-            // Для простоты сейчас: владелец = полный доступ, если OWNER есть среди требуемых.
         }
 
-        // 2. Проверяем, является ли пользователь участником с нужной ролью
         val projectUser = projectUserRepository.findByProject_IdAndUser_Id(projectId, userId)
         if (projectUser != null && requiredRoles.contains(projectUser.role)) {
             return
@@ -212,7 +184,6 @@ class ProjectService(
         throw AccessDeniedException("User does not have sufficient permissions for this operation on the project.")
     }
 
-    // Перегруженная версия для одной требуемой роли
     fun checkAccessToProject(projectId: Long, userId: Long, requiredRole: ProjectRole) {
         checkAccessToProject(projectId, userId, listOf(requiredRole))
     }

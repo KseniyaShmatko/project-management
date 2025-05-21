@@ -38,13 +38,10 @@ class FileService(private val fileRepository: FileRepository, private val fileTy
 
         Hibernate.initialize(existing.type)
 
-        // Обновляем File, сохраняя неизмененные поля
         val modified = existing.copy(
             name = update.name,
             type = type,
             authorId = update.authorId,
-            // Сохраняем существующие значения для полей, которые не должны изменяться
-            // или берем новые значения из update, если они есть
             superObjectId = update.superObjectId ?: existing.superObjectId
         )
         return fileRepository.save(modified)
@@ -56,7 +53,6 @@ class FileService(private val fileRepository: FileRepository, private val fileTy
         
         Hibernate.initialize(existing.type)
 
-        // Создаем копию с обновленным superObjectId
         val modified = File(
             id = existing.id,
             name = existing.name,

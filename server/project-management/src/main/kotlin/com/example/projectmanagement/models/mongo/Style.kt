@@ -8,7 +8,7 @@ data class Style(
     @Id
     var id: String? = null,
     var objectType: String? = "style",
-    var appliedObject: String? = null, // "text" | "picture" | "video"
+    var appliedObject: String? = null,
     var alignment: String? = null,
     var color: String? = null,
     var fontFamily: String? = null,
@@ -18,6 +18,6 @@ data class Style(
     var marginLeft: Int? = null,
     var marginBottom: Int? = null,
     var frame: Boolean? = null,
-    var padding: List<Int>? = null,       // [top, right, bottom, left]
-    var position: List<Int>? = null       // [top, right, bottom, left]
+    var padding: List<Int>? = null,
+    var position: List<Int>? = null
 )

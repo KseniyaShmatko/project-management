@@ -1,4 +1,3 @@
-// src/main/kotlin/com/example/projectmanagement/controllers/dto/ResponseDto.kt
 package com.example.projectmanagement.controllers.dto
 
 import com.example.projectmanagement.models.ProjectRole
@@ -13,7 +12,7 @@ data class UserResponseDto(
     val photo: String?
 )
 
-data class ProjectParticipantDto( // Новый DTO для участника
+data class ProjectParticipantDto(
     val userId: Long,
     val login: String,
     val name: String?,
@@ -28,6 +27,6 @@ data class ProjectResponseDto(
     val description: String?,
     val owner: UserResponseDto?,
     val projectFiles: List<ProjectFileResponseDto>,
-    val participants: List<ProjectParticipantDto>, // Список участников
-    val currentUserRole: ProjectRole? // Роль текущего пользователя в этом проекте
+    val participants: List<ProjectParticipantDto>,
+    val currentUserRole: ProjectRole?
 )

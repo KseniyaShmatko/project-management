@@ -1,6 +1,6 @@
 package com.example.projectmanagement.controllers
 
-import com.example.projectmanagement.services.FileDownloadService // Новый сервис
+import com.example.projectmanagement.services.FileDownloadService
 import org.springframework.core.io.Resource
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -17,10 +17,10 @@ class FileDownloadController(private val fileDownloadService: FileDownloadServic
         @PathVariable file_id: Long
     ): ResponseEntity<Resource> {
         val resource = fileDownloadService.getFileAsResource(project_id, file_id)
-        val filename = resource.filename ?: "downloaded_file" // Получить оригинальное имя файла
+        val filename = resource.filename ?: "downloaded_file"
 
         return ResponseEntity.ok()
-            .contentType(MediaType.APPLICATION_OCTET_STREAM) // или определить тип по расширению файла
+            .contentType(MediaType.APPLICATION_OCTET_STREAM)
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"$filename\"")
             .body(resource)
     }

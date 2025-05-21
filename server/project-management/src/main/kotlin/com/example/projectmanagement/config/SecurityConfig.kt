@@ -1,5 +1,4 @@
-// src/main/kotlin/com/example/projectmanagement/config/SecurityConfig.kt
-package com.example.projectmanagement.config // или com.example.projectmanagement.security
+package com.example.projectmanagement.config
 
 import com.example.projectmanagement.security.JwtTokenFilter
 import com.example.projectmanagement.security.JwtTokenProvider
@@ -20,7 +19,7 @@ import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
-@EnableWebSecurity // Включает веб-безопасность Spring
+@EnableWebSecurity
 class SecurityConfig(
     private val jwtTokenProvider: JwtTokenProvider
 ) {
@@ -59,10 +58,10 @@ class SecurityConfig(
             }
             .authorizeHttpRequests { authorize ->
                 authorize
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // Разрешаем OPTIONS запросы
-                    .requestMatchers("/users/login").permitAll()            // Путь для входа
-                    .requestMatchers("/users/register").permitAll()         // Путь для регистрации
-                    .requestMatchers("/uploads/**").permitAll()             // ДОБАВЛЯЕМ ЭТУ СТРОКУ!
+                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
+                    .requestMatchers("/users/login").permitAll()      
+                    .requestMatchers("/users/register").permitAll()  
+                    .requestMatchers("/uploads/**").permitAll()
                     .requestMatchers("/users/search").authenticated()
                     .anyRequest().authenticated()
             }

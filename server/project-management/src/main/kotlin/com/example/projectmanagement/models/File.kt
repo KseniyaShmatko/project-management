@@ -13,9 +13,9 @@ data class File(
 
     @ManyToOne(fetch = FetchType.LAZY) 
     @JoinColumn(name = "type_id", nullable = false)
-    var type: FileType?, // Если тип всегда есть ПЕРЕД сохранением, то FileType (без ?)
+    var type: FileType?,
 
-    @Column(name = "author") // Явно указываем, что это ID автора
+    @Column(name = "author")
     val authorId: Long,
 
     @Column(name = "upload_date")
@@ -24,7 +24,7 @@ data class File(
     @Column(name = "super_object_id")
     var superObjectId: String? = null,
     
-    @Column(name = "file_path") // Путь к файлу на диске/в хранилище
+    @Column(name = "file_path")
     var filePath: String? = null
 ) {
     override fun equals(other: Any?): Boolean {
