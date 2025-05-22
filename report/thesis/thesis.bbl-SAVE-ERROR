@@ -16,5 +16,246 @@
   {}
 \endgroup
 
+
+\refsection{0}
+  \datalist[entry]{none/global//global/global}
+    \entry{database}{book}{}
+      \name{author}{1}{}{%
+        {{hash=eaccb8b8cabd018035bb686ee4d1623f}{%
+           family={С.\bibnamedelimi А.\bibnamedelimi Нестеров},
+           familyi={С\bibinitperiod\bibinitdelim А\bibinitperiod\bibinitdelim Н\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {СПб.: Издательство Политехнического универстета}%
+      }
+      \strng{namehash}{eaccb8b8cabd018035bb686ee4d1623f}
+      \strng{fullhash}{eaccb8b8cabd018035bb686ee4d1623f}
+      \strng{bibnamehash}{eaccb8b8cabd018035bb686ee4d1623f}
+      \strng{authorbibnamehash}{eaccb8b8cabd018035bb686ee4d1623f}
+      \strng{authornamehash}{eaccb8b8cabd018035bb686ee4d1623f}
+      \strng{authorfullhash}{eaccb8b8cabd018035bb686ee4d1623f}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Базы данных: учеб. пособие}
+      \field{year}{2013}
+      \field{pages}{150}
+      \range{pages}{1}
+    \endentry
+    \entry{kazan}{book}{}
+      \name{author}{1}{}{%
+        {{hash=d5c4abcf557b0d4abbb2a117c5717bfd}{%
+           family={Н.\bibnamedelimi Р.\bibnamedelimi Бухараев},
+           familyi={Н\bibinitperiod\bibinitdelim Р\bibinitperiod\bibinitdelim Б\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Казань: Казанский университет}%
+      }
+      \strng{namehash}{d5c4abcf557b0d4abbb2a117c5717bfd}
+      \strng{fullhash}{d5c4abcf557b0d4abbb2a117c5717bfd}
+      \strng{bibnamehash}{d5c4abcf557b0d4abbb2a117c5717bfd}
+      \strng{authorbibnamehash}{d5c4abcf557b0d4abbb2a117c5717bfd}
+      \strng{authornamehash}{d5c4abcf557b0d4abbb2a117c5717bfd}
+      \strng{authorfullhash}{d5c4abcf557b0d4abbb2a117c5717bfd}
+      \field{sortinit}{2}
+      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Введение в реляционные базы данных и программирование на языке SQL}
+      \field{year}{2018}
+      \field{pages}{134}
+      \range{pages}{1}
+    \endentry
+    \entry{big_data}{book}{}
+      \name{author}{1}{}{%
+        {{hash=0d49af0ae8f1feffe5046924a7768406}{%
+           family={Ю.\bibnamedelimi Л.\bibnamedelimi Назаренко},
+           familyi={Ю\bibinitperiod\bibinitdelim Л\bibinitperiod\bibinitdelim Н\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Донской государственный технический университет}%
+      }
+      \strng{namehash}{0d49af0ae8f1feffe5046924a7768406}
+      \strng{fullhash}{0d49af0ae8f1feffe5046924a7768406}
+      \strng{bibnamehash}{0d49af0ae8f1feffe5046924a7768406}
+      \strng{authorbibnamehash}{0d49af0ae8f1feffe5046924a7768406}
+      \strng{authornamehash}{0d49af0ae8f1feffe5046924a7768406}
+      \strng{authorfullhash}{0d49af0ae8f1feffe5046924a7768406}
+      \field{sortinit}{4}
+      \field{sortinithash}{9381316451d1b9788675a07e972a12a7}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Обзор технологии "большие данные" (Big Data) и программно-аппаратных средств, применяемых для их анализа и обработки}
+      \field{year}{2016}
+      \field{pages}{7}
+      \range{pages}{1}
+    \endentry
+    \entry{systems}{book}{}
+      \name{author}{1}{}{%
+        {{hash=a8d4600e9166521e6a0eb06e877e8296}{%
+           family={Р.\bibnamedelimi Э.\bibnamedelimi Мамедли},
+           familyi={Р\bibinitperiod\bibinitdelim Э\bibinitperiod\bibinitdelim М\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Нижневаторск : Издательство Нижневартовского государственного университета}%
+      }
+      \strng{namehash}{a8d4600e9166521e6a0eb06e877e8296}
+      \strng{fullhash}{a8d4600e9166521e6a0eb06e877e8296}
+      \strng{bibnamehash}{a8d4600e9166521e6a0eb06e877e8296}
+      \strng{authorbibnamehash}{a8d4600e9166521e6a0eb06e877e8296}
+      \strng{authornamehash}{a8d4600e9166521e6a0eb06e877e8296}
+      \strng{authorfullhash}{a8d4600e9166521e6a0eb06e877e8296}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Системы управления базами данных: учебное пособие}
+      \field{year}{2021}
+      \field{pages}{214}
+      \range{pages}{1}
+    \endentry
+    \entry{mongo}{misc}{}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{[Электронный ресурс]. ~--- Режим доступа: \url{https://www.mongodb.com/docs/manual/} (дата обращения: 03.11.2024)}
+      \field{title}{MongoDB Documentation}
+    \endentry
+    \entry{cassandra}{misc}{}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{[Электронный ресурс]. ~--- Режим доступа: \url{https://cassandra.apache.org/doc/latest/} (дата обращения: 03.11.2024)}
+      \field{title}{Cassandra Documentation}
+    \endentry
+    \entry{postgres}{misc}{}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{[Электронный ресурс]. ~--- Режим доступа: \url{https://www.postgresql.org/docs/} (дата обращения: 03.11.2024)}
+      \field{title}{PostgreSQL Documentation}
+    \endentry
+    \entry{mySQL}{misc}{}
+      \field{sortinit}{6}
+      \field{sortinithash}{b33bc299efb3c36abec520a4c896a66d}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{[Электронный ресурс]. ~--- Режим доступа: \url{https://dev.mysql.com/doc/} (дата обращения: 03.11.2024)}
+      \field{title}{MySQL Documentation}
+    \endentry
+    \entry{data-aggreg}{book}{}
+      \name{author}{1}{}{%
+        {{hash=f271a3791877547766dd17441d986d07}{%
+           family={Wen\bibnamedelima Tao},
+           familyi={W\bibinitperiod\bibinitdelim T\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Springer International Publishing, Cham}%
+      }
+      \strng{namehash}{f271a3791877547766dd17441d986d07}
+      \strng{fullhash}{f271a3791877547766dd17441d986d07}
+      \strng{bibnamehash}{f271a3791877547766dd17441d986d07}
+      \strng{authorbibnamehash}{f271a3791877547766dd17441d986d07}
+      \strng{authornamehash}{f271a3791877547766dd17441d986d07}
+      \strng{authorfullhash}{f271a3791877547766dd17441d986d07}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Data Aggregation: Encyclopedia of Big Data}
+      \field{year}{2020}
+    \endentry
+    \entry{ran}{book}{}
+      \name{author}{2}{}{%
+        {{hash=06437c4e8bdd2138a968540931b22cd7}{%
+           family={С.\bibnamedelimi Д.\bibnamedelimi Кузнецов},
+           familyi={С\bibinitperiod\bibinitdelim Д\bibinitperiod\bibinitdelim К\bibinitperiod}}}%
+        {{hash=1ca94ea8910c2baf88d4125d03904834}{%
+           family={А.\bibnamedelimi В.\bibnamedelimi Посконин},
+           familyi={А\bibinitperiod\bibinitdelim В\bibinitperiod\bibinitdelim П\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {Труды Института системного программирования РАН}%
+      }
+      \strng{namehash}{05554bbdf484e0094bce91c48acd80cf}
+      \strng{fullhash}{05554bbdf484e0094bce91c48acd80cf}
+      \strng{bibnamehash}{05554bbdf484e0094bce91c48acd80cf}
+      \strng{authorbibnamehash}{05554bbdf484e0094bce91c48acd80cf}
+      \strng{authornamehash}{05554bbdf484e0094bce91c48acd80cf}
+      \strng{authorfullhash}{05554bbdf484e0094bce91c48acd80cf}
+      \field{sortinit}{8}
+      \field{sortinithash}{a231b008ebf0ecbe0b4d96dcc159445f}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{Распределенные горизонтально масштабируемые решения для управления данными}
+      \field{year}{2013}
+    \endentry
+    \entry{shard-rep}{book}{}
+      \name{author}{3}{}{%
+        {{hash=414088dc4e8b47dde9f9c1a130b34450}{%
+           family={A.\bibnamedelimi Silberschatz},
+           familyi={A\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=affa42f8671ad87283b080dea2c7addd}{%
+           family={F.\bibnamedelimi Korth\bibnamedelima Henry},
+           familyi={F\bibinitperiod\bibinitdelim K\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+        {{hash=6b7bfff60da2a50c292e4a51d56df12b}{%
+           family={S.\bibnamedelimi Sudarshan},
+           familyi={S\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+      }
+      \list{publisher}{1}{%
+        {McGraw-Hill Education}%
+      }
+      \strng{namehash}{39f7689272a5517a6857d297de098d1a}
+      \strng{fullhash}{39f7689272a5517a6857d297de098d1a}
+      \strng{bibnamehash}{39f7689272a5517a6857d297de098d1a}
+      \strng{authorbibnamehash}{39f7689272a5517a6857d297de098d1a}
+      \strng{authornamehash}{39f7689272a5517a6857d297de098d1a}
+      \strng{authorfullhash}{39f7689272a5517a6857d297de098d1a}
+      \field{sortinit}{9}
+      \field{sortinithash}{0a5ebc79d83c96b6579069544c73c7d4}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{title}{DATABASE SYSTEM CONCEPTS, SEVENTH EDITION}
+      \field{year}{2020}
+      \field{pages}{1337}
+      \range{pages}{1}
+    \endentry
+    \entry{postgres-rep}{misc}{}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{[Электронный ресурс]. ~--- Режим доступа: \url{https://www.postgresql.org/docs/current/runtime-config-replication.html} (дата обращения: 20.11.2024)}
+      \field{title}{Документация PostgreSQL: Replication}
+    \endentry
+    \entry{citusdata}{misc}{}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{[Электронный ресурс]. ~--- Режим доступа: \url{https://docs.citusdata.com/en/stable/} (дата обращения: 20.11.2024)}
+      \field{title}{Citus Data Documentation}
+    \endentry
+    \entry{postgres-xl}{misc}{}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{[Электронный ресурс]. ~--- Режим доступа: \url{https://omnidb.readthedocs.io/en/2.17.0/en/18_postgres-xl.html} (дата обращения: 20.11.2024)}
+      \field{title}{Postgres-XL Documentation}
+    \endentry
+    \entry{pgpool}{misc}{}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{[Электронный ресурс]. ~--- Режим доступа: \url{https://www.pgpool.net/mediawiki/index.php/Main_Page} (дата обращения: 20.11.2024)}
+      \field{title}{PgPool Documentation}
+    \endentry
+    \entry{pgbouncer}{misc}{}
+      \field{sortinit}{1}
+      \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
+      \field{labeltitlesource}{title}
+      \field{howpublished}{[Электронный ресурс]. ~--- Режим доступа: \url{https://www.pgbouncer.org/config.html} (дата обращения: 20.11.2024)}
+      \field{title}{PgBouncer Documentation}
+    \endentry
+  \enddatalist
+\endrefsection
 \endinput
 

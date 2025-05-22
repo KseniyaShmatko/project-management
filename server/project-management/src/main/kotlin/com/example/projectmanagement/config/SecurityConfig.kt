@@ -59,6 +59,7 @@ class SecurityConfig(
             .authorizeHttpRequests { authorize ->
                 authorize
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
+                    .requestMatchers("/ws/notes").permitAll()
                     .requestMatchers("/users/login").permitAll()      
                     .requestMatchers("/users/register").permitAll()  
                     .requestMatchers("/uploads/**").permitAll()
