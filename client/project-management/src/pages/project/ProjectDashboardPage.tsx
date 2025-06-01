@@ -132,7 +132,7 @@ const ProjectDashboardPage: React.FC = () => {
     }
   };
 
-  const handleSubmitNewFile = async (fileName: string) => {
+  const handleSubmitNewFile = async (fileName: string, fileTypeId?: number) => {
     if (selectedProjectId === null || !user) {
       alert("Проект не выбран или пользователь не авторизован!");
       return;
@@ -144,24 +144,28 @@ const ProjectDashboardPage: React.FC = () => {
     }
     setIsSubmitting(true);
     try {
-      const documentFileType = fileTypes.find(ft => 
-        ft.name.toLowerCase() === 'note'
-      );
-      if (!documentFileType) {
-        alert("Системный тип файла 'document'/'note' не найден. Обратитесь к администратору.");
-        setIsSubmitting(false); return;
+      let typeIdToUse = fileTypeId;
+      if (!typeIdToUse) {
+        const documentFileType = fileTypes.find(ft => 
+          ft.name.toLowerCase() === 'note'
+        );
+        if (!documentFileType) {
+          alert("Системный тип файла 'note' не найден. Обратитесь к администратору.");
+          setIsSubmitting(false); return;
+        }
+        typeIdToUse = documentFileType.id;
       }
 
       const newFileDto: FileCreateDto = { 
         name: fileName, 
-        typeId: documentFileType.id,
+        typeId: typeIdToUse,
         authorId: user.id,
       };
       const createdFileMetadata: FileMetadata = await createFileMetadataApi(newFileDto);
-      
+
       const newSuperObjectData: SuperObject = {
         fileId: createdFileMetadata.id, 
-        serviceType: documentFileType.name,
+        serviceType: 'NOTE',
         name: createdFileMetadata.name,
       };
       const createdSuperObject = await createSuperObject(newSuperObjectData);
@@ -312,6 +316,8 @@ const ProjectDashboardPage: React.FC = () => {
           title="Создать новый файл"
           inputLabel="Имя файла"
           isLoading={isSubmitting}
+          showFileTypeSelect={true}
+          fileTypes={fileTypes}
         />
       )}
       {currentProjectDetails && user && (

@@ -24,3 +24,18 @@
   padding-top: 20px;
   border-top: 1px solid var(--g-color-line-generic);
 }
+
+.name-input-dialog__file-type-select {
+  margin-top: 10px;
+}
+
+.name-input-dialog__button_ok {
+  margin-left: 6px;
+}
+
+.name-input-dialog__buttons {
+  display: flex;
+  flex-direction:row;
+  justify-content: end;
+  align-items: center;
+}

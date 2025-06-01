@@ -88,3 +88,19 @@ spring.datasource.password=project_pass
   - /projects, /users, /files — проекты, пользователи, файл (PostgreSQL)
 
 - Описание ручек смотрите в OpenAPI/Swagger-спецификации или в папке controllers.
+
+### 6. Тестирование
+
+Для запуска тестов выполните команду: 
+```bash
+./gradlew test
+```
+
+Для измерения тестового покрытия выполните: 
+```bash
+./gradlew test jacocoTestReport
+```
+и затем откройте отчет:
+```bash
+open build/jacocoHtml/index.html
+```
