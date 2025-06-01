@@ -361,12 +361,10 @@ class ProjectServiceTest {
     
     @Test
     fun `getCurrentUser - when authenticated - should return user`() {
-        // Act
         val result = projectService.javaClass.getDeclaredMethod("getCurrentUser").apply {
             isAccessible = true
         }.invoke(projectService) as User
         
-        // Assert
         assertEquals(mockUser.id, result.id)
         assertEquals(mockUser.name, result.name)
         assertEquals(mockUser.login, result.login)
@@ -374,7 +372,6 @@ class ProjectServiceTest {
 
     @Test
     fun `getCurrentUser - when not authenticated - should throw IllegalStateException`() {
-        // Arrange
         val authentication = mock(Authentication::class.java)
         val securityContext = mock(SecurityContext::class.java)
         
@@ -383,7 +380,6 @@ class ProjectServiceTest {
         
         SecurityContextHolder.setContext(securityContext)
         
-        // Act & Assert
         val method = projectService.javaClass.getDeclaredMethod("getCurrentUser").apply {
             isAccessible = true
         }
@@ -399,7 +395,6 @@ class ProjectServiceTest {
 
     @Test
     fun `getCurrentUser - when principal is not User - should throw IllegalStateException`() {
-        // Arrange
         val authentication = mock(Authentication::class.java)
         val securityContext = mock(SecurityContext::class.java)
         
@@ -409,7 +404,6 @@ class ProjectServiceTest {
         
         SecurityContextHolder.setContext(securityContext)
         
-        // Act & Assert
         val method = projectService.javaClass.getDeclaredMethod("getCurrentUser").apply {
             isAccessible = true
         }
@@ -424,7 +418,6 @@ class ProjectServiceTest {
 
     @Test
     fun `getProjectsForCurrentUser - should return projects for current user`() {
-        // Arrange
         val project1 = Project(
             id = 1L,
             name = "Project 1",
@@ -454,10 +447,8 @@ class ProjectServiceTest {
         
         `when`(projectRepository.findParticipatedProjectsByUserIdWithDetails(mockUser.id)).thenReturn(participatedProjects)
         
-        // Act
         val result = projectService.getProjectsForCurrentUser()
         
-        // Assert
         assertEquals(2, result.size)
         assertEquals(project1.id, result[0].id)
         assertEquals(project1.name, result[0].name)
@@ -469,7 +460,6 @@ class ProjectServiceTest {
 
     @Test
     fun `projectToProjectResponseDto - when user is owner - should set owner role`() {
-        // Arrange
         val project = Project(
             id = 1L,
             name = "Test Project",
@@ -479,10 +469,8 @@ class ProjectServiceTest {
             projectFiles = mutableSetOf()
         )
         
-        // Act
         val result = projectService.projectToProjectResponseDto(project, mockUser)
         
-        // Assert
         assertEquals(project.id, result.id)
         assertEquals(project.name, result.name)
         assertEquals(project.description, result.description)
@@ -494,7 +482,6 @@ class ProjectServiceTest {
 
     @Test
     fun `projectToProjectResponseDto - when user is participant - should set user role`() {
-        // Arrange
         val anotherUser = User(
             id = 2L,
             name = "Another",
@@ -519,10 +506,8 @@ class ProjectServiceTest {
         
         project.projectUsers = mutableSetOf(projectUser)
         
-        // Act
         val result = projectService.projectToProjectResponseDto(project, mockUser)
         
-        // Assert
         assertEquals(project.id, result.id)
         assertEquals(project.name, result.name)
         assertEquals(project.description, result.description)
@@ -536,7 +521,6 @@ class ProjectServiceTest {
 
     @Test
     fun `projectToProjectResponseDto - when user is not participant - should set null role`() {
-        // Arrange
         val anotherUser = User(
             id = 2L,
             name = "Another",
@@ -569,10 +553,8 @@ class ProjectServiceTest {
         
         project.projectUsers = mutableSetOf(projectUser)
         
-        // Act
         val result = projectService.projectToProjectResponseDto(project, mockUser)
         
-        // Assert
         assertEquals(project.id, result.id)
         assertEquals(project.name, result.name)
         assertEquals(project.description, result.description)
@@ -584,7 +566,6 @@ class ProjectServiceTest {
 
     @Test
     fun `projectToProjectResponseDto - with project files - should map files correctly`() {
-        // Arrange
         val fileType = FileType(id = 1L, name = "note")
         
         val file = File(
@@ -609,10 +590,8 @@ class ProjectServiceTest {
             projectFiles = mutableSetOf(projectFile)
         )
         
-        // Act
         val result = projectService.projectToProjectResponseDto(project, mockUser)
         
-        // Assert
         assertEquals(1, result.projectFiles.size)
         assertEquals(file.id, result.projectFiles[0].id)
         assertEquals(file.name, result.projectFiles[0].name)
@@ -623,7 +602,6 @@ class ProjectServiceTest {
 
     @Test
     fun `toProjectFileResponseDto - should convert ProjectFile to DTO`() {
-        // Arrange
         val fileType = FileType(id = 1L, name = "note")
         
         val file = File(
@@ -641,12 +619,10 @@ class ProjectServiceTest {
             file = file
         )
         
-        // Act
         val result = projectService.javaClass.getDeclaredMethod("toProjectFileResponseDto", ProjectFile::class.java).apply {
             isAccessible = true
         }.invoke(projectService, projectFile) as ProjectFileResponseDto
         
-        // Assert
         assertEquals(file.id, result.id)
         assertEquals(file.name, result.name)
         assertEquals(fileType.id, result.type.id)
@@ -658,11 +634,10 @@ class ProjectServiceTest {
 
     @Test
     fun `toProjectFileResponseDto - when file type is null - should throw IllegalStateException`() {
-        // Arrange
         val file = File(
             id = 1L,
             name = "Test File",
-            type = null, // Null type
+            type = null,
             authorId = mockUser.id,
             uploadDate = LocalDateTime.now()
         )
@@ -673,7 +648,6 @@ class ProjectServiceTest {
             file = file
         )
         
-        // Act & Assert
         val method = projectService.javaClass.getDeclaredMethod("toProjectFileResponseDto", ProjectFile::class.java).apply {
             isAccessible = true
         }
@@ -689,7 +663,6 @@ class ProjectServiceTest {
 
     @Test
     fun `toUserResponseDto - should convert User to DTO`() {
-        // Arrange
         val user = User(
             id = 1L,
             name = "Test",
@@ -699,12 +672,10 @@ class ProjectServiceTest {
             photo = "photo.jpg"
         )
         
-        // Act
         val result = projectService.javaClass.getDeclaredMethod("toUserResponseDto", User::class.java).apply {
             isAccessible = true
         }.invoke(projectService, user) as UserResponseDto
         
-        // Assert
         assertEquals(user.id, result.id)
         assertEquals(user.name, result.name)
         assertEquals(user.surname, result.surname)
@@ -715,15 +686,12 @@ class ProjectServiceTest {
 
     @Test
     fun `toFileTypeResponseDto - should convert FileType to DTO`() {
-        // Arrange
         val fileType = FileType(id = 1L, name = "note")
         
-        // Act
         val result = projectService.javaClass.getDeclaredMethod("toFileTypeResponseDto", FileType::class.java).apply {
             isAccessible = true
         }.invoke(projectService, fileType) as FileTypeResponseDto
         
-        // Assert
         assertEquals(fileType.id, result.id)
         assertEquals(fileType.name, result.name)
     }

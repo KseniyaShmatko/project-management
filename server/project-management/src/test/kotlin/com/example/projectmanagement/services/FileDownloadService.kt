@@ -39,15 +39,12 @@ class FileDownloadServiceTest {
 
     @BeforeEach
     fun setup() {
-        // Очищаем контекст безопасности перед каждым тестом
         SecurityContextHolder.clearContext()
         
-        // Создаем моки репозиториев и сервисов
         projectService = mock(ProjectService::class.java)
         projectFileRepository = mock(ProjectFileRepository::class.java)
         fileRepository = mock(FileRepository::class.java)
         
-        // Создаем тестового пользователя
         mockUser = User(
             id = 1L,
             name = "Test",
@@ -56,7 +53,6 @@ class FileDownloadServiceTest {
             passwordInternal = "password"
         )
         
-        // Настраиваем SecurityContextHolder
         val authentication = mock(Authentication::class.java)
         `when`(authentication.principal).thenReturn(mockUser)
         `when`(authentication.isAuthenticated).thenReturn(true)
@@ -66,7 +62,6 @@ class FileDownloadServiceTest {
         
         SecurityContextHolder.setContext(securityContext)
         
-        // Создаем сервис для тестирования
         fileDownloadService = FileDownloadService(
             projectService,
             projectFileRepository,
@@ -76,11 +71,9 @@ class FileDownloadServiceTest {
 
     @Test
     fun `getFileAsResource - when file exists - should return resource`() {
-        // Arrange
         val projectId = 1L
         val fileId = 2L
-        
-        // Создаем тестовый файл во временной директории
+    
         val testFilePath = tempDir.resolve("test.txt")
         Files.write(testFilePath, "Test content".toByteArray())
         
@@ -110,15 +103,12 @@ class FileDownloadServiceTest {
             file = file
         )
         
-        // Настраиваем моки
         doNothing().`when`(projectService).checkAccessToProject(projectId, mockUser.id, listOf(ProjectRole.VIEWER, ProjectRole.EDITOR, ProjectRole.OWNER))
         `when`(projectFileRepository.findByProject_IdAndFile_Id(projectId, fileId)).thenReturn(projectFile)
         `when`(fileRepository.findById(fileId)).thenReturn(Optional.of(file))
-        
-        // Act
+
         val result = fileDownloadService.getFileAsResource(projectId, fileId)
         
-        // Assert
         assertTrue(result.exists())
         assertTrue(result.isReadable())
         
@@ -129,15 +119,12 @@ class FileDownloadServiceTest {
 
     @Test
     fun `getFileAsResource - when file not found in project - should throw not found exception`() {
-        // Arrange
         val projectId = 1L
         val fileId = 2L
         
-        // Настраиваем моки
         doNothing().`when`(projectService).checkAccessToProject(projectId, mockUser.id, listOf(ProjectRole.VIEWER, ProjectRole.EDITOR, ProjectRole.OWNER))
         `when`(projectFileRepository.findByProject_IdAndFile_Id(projectId, fileId)).thenReturn(null)
         
-        // Act & Assert
         val exception = assertFailsWith<ResponseStatusException> {
             fileDownloadService.getFileAsResource(projectId, fileId)
         }
@@ -152,7 +139,6 @@ class FileDownloadServiceTest {
 
     @Test
     fun `getFileAsResource - when file path is null - should throw internal server error`() {
-        // Arrange
         val projectId = 1L
         val fileId = 2L
         
@@ -173,7 +159,7 @@ class FileDownloadServiceTest {
             type = fileType,
             authorId = mockUser.id,
             uploadDate = LocalDateTime.now(),
-            filePath = null // Отсутствует путь к файлу
+            filePath = null
         )
         
         val projectFile = ProjectFile(
@@ -181,13 +167,11 @@ class FileDownloadServiceTest {
             project = project,
             file = file
         )
-        
-        // Настраиваем моки
+
         doNothing().`when`(projectService).checkAccessToProject(projectId, mockUser.id, listOf(ProjectRole.VIEWER, ProjectRole.EDITOR, ProjectRole.OWNER))
         `when`(projectFileRepository.findByProject_IdAndFile_Id(projectId, fileId)).thenReturn(projectFile)
         `when`(fileRepository.findById(fileId)).thenReturn(Optional.of(file))
-        
-        // Act & Assert
+
         val exception = assertFailsWith<ResponseStatusException> {
             fileDownloadService.getFileAsResource(projectId, fileId)
         }

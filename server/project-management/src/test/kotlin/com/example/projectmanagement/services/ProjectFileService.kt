@@ -46,10 +46,8 @@ class ProjectFileServiceTest {
 
     @BeforeEach
     fun setup() {
-        // Очищаем контекст безопасности перед каждым тестом
         SecurityContextHolder.clearContext()
         
-        // Создаем моки репозиториев и сервисов
         projectFileRepository = mock(ProjectFileRepository::class.java)
         projectRepository = mock(ProjectRepository::class.java)
         fileRepository = mock(FileRepository::class.java)
@@ -58,7 +56,6 @@ class ProjectFileServiceTest {
         projectService = mock(ProjectService::class.java)
         superObjectRepository = mock(SuperObjectRepository::class.java)
         
-        // Создаем тестового пользователя
         mockUser = User(
             id = 1L,
             name = "Test",
@@ -67,7 +64,6 @@ class ProjectFileServiceTest {
             passwordInternal = "password"
         )
         
-        // Настраиваем SecurityContextHolder
         val authentication = mock(Authentication::class.java)
         `when`(authentication.principal).thenReturn(mockUser)
         `when`(authentication.isAuthenticated).thenReturn(true)
@@ -77,7 +73,6 @@ class ProjectFileServiceTest {
         
         SecurityContextHolder.setContext(securityContext)
         
-        // Создаем сервис для тестирования
         projectFileService = ProjectFileService(
             projectFileRepository,
             projectRepository,
@@ -91,7 +86,6 @@ class ProjectFileServiceTest {
 
     @Test
     fun `uploadAndLinkFile - should upload file and link to project`() {
-        // Arrange
         val projectId = 1L
         val typeId = 1L
         val multipartFile = MockMultipartFile(
@@ -125,8 +119,7 @@ class ProjectFileServiceTest {
             project = project,
             file = savedFile
         )
-        
-        // Подготавливаем ожидаемый DTO ответа
+
         val expectedResponseDto = ProjectFileResponseDto(
             id = savedFile.id,
             name = savedFile.name,
@@ -136,17 +129,14 @@ class ProjectFileServiceTest {
             superObjectId = null
         )
         
-        // Настраиваем моки
         doNothing().`when`(projectService).checkAccessToProject(eq(projectId), eq(mockUser.id), anyList())
         `when`(projectRepository.findById(projectId)).thenReturn(Optional.of(project))
         `when`(fileTypeRepository.findById(typeId)).thenReturn(Optional.of(fileType))
         `when`(fileRepository.save(any(File::class.java))).thenReturn(savedFile)
         `when`(projectFileRepository.save(any(ProjectFile::class.java))).thenReturn(projectFile)
         
-        // Act
         val result = projectFileService.uploadAndLinkFile(projectId, multipartFile, typeId)
         
-        // Assert
         assertNotNull(result)
         assertEquals(expectedResponseDto.id, result.id)
         assertEquals(expectedResponseDto.name, result.name)
@@ -163,7 +153,6 @@ class ProjectFileServiceTest {
 
     @Test
     fun `linkExistingFile - should link existing file to project`() {
-        // Arrange
         val projectId = 1L
         val fileId = 2L
         
@@ -192,17 +181,14 @@ class ProjectFileServiceTest {
             file = file
         )
         
-        // Настраиваем моки
         doNothing().`when`(projectService).checkAccessToProject(eq(projectId), eq(mockUser.id), anyList())
         `when`(projectRepository.findById(projectId)).thenReturn(Optional.of(project))
         `when`(fileRepository.findById(fileId)).thenReturn(Optional.of(file))
         `when`(projectFileRepository.existsByProject_IdAndFile_Id(projectId, fileId)).thenReturn(false)
         `when`(projectFileRepository.save(any(ProjectFile::class.java))).thenReturn(projectFile)
         
-        // Act
         val result = projectFileService.linkExistingFile(projectId, fileId)
         
-        // Assert
         assertNotNull(result)
         assertEquals(projectFile.id, result.id)
         assertEquals(project.id, result.project.id)
@@ -217,7 +203,6 @@ class ProjectFileServiceTest {
 
     @Test
     fun `linkExistingFile - when file already linked - should throw conflict exception`() {
-        // Arrange
         val projectId = 1L
         val fileId = 2L
         
@@ -240,13 +225,11 @@ class ProjectFileServiceTest {
             uploadDate = LocalDateTime.now()
         )
         
-        // Настраиваем моки
         doNothing().`when`(projectService).checkAccessToProject(eq(projectId), eq(mockUser.id), anyList())
         `when`(projectRepository.findById(projectId)).thenReturn(Optional.of(project))
         `when`(fileRepository.findById(fileId)).thenReturn(Optional.of(file))
         `when`(projectFileRepository.existsByProject_IdAndFile_Id(projectId, fileId)).thenReturn(true)
         
-        // Act & Assert
         val exception = assertFailsWith<ResponseStatusException> {
             projectFileService.linkExistingFile(projectId, fileId)
         }
@@ -263,7 +246,6 @@ class ProjectFileServiceTest {
 
     @Test
     fun `getFilesForProjectWithDetails - should return files for project`() {
-        // Arrange
         val projectId = 1L
         
         val fileType = FileType(
@@ -307,7 +289,6 @@ class ProjectFileServiceTest {
         
         val projectFiles = listOf(projectFile1, projectFile2)
         
-        // Подготавливаем ожидаемые DTO ответа
         val expectedFileResponses = listOf(
             ProjectFileResponseDto(
                 id = file1.id,
@@ -327,14 +308,11 @@ class ProjectFileServiceTest {
             )
         )
         
-        // Настраиваем моки
         doNothing().`when`(projectService).checkAccessToProject(eq(projectId), eq(mockUser.id), anyList())
         `when`(projectFileRepository.findAllByProject_Id(projectId)).thenReturn(projectFiles)
         
-        // Act
         val result = projectFileService.getFilesForProjectWithDetails(projectId)
         
-        // Assert
         assertNotNull(result)
         assertEquals(2, result.size)
         assertEquals(expectedFileResponses[0].id, result[0].id)
@@ -348,7 +326,6 @@ class ProjectFileServiceTest {
 
     @Test
     fun `updateFileNameInProject - should update file name`() {
-        // Arrange
         val projectId = 1L
         val fileId = 2L
         val newName = "Updated File Name"
@@ -386,7 +363,6 @@ class ProjectFileServiceTest {
             file = originalFile
         )
         
-        // Подготавливаем ожидаемый DTO ответа
         val expectedResponse = ProjectFileResponseDto(
             id = updatedFile.id,
             name = updatedFile.name,
@@ -396,15 +372,12 @@ class ProjectFileServiceTest {
             superObjectId = null
         )
         
-        // Настраиваем моки
         doNothing().`when`(projectService).checkAccessToProject(eq(projectId), eq(mockUser.id), anyList())
         `when`(projectFileRepository.findByProject_IdAndFile_Id(projectId, fileId)).thenReturn(projectFile)
         `when`(fileRepository.save(any(File::class.java))).thenReturn(updatedFile)
         
-        // Act
         val result = projectFileService.updateFileNameInProject(projectId, fileId, newName)
         
-        // Assert
         assertNotNull(result)
         assertEquals(expectedResponse.id, result.id)
         assertEquals(expectedResponse.name, result.name)
@@ -416,7 +389,6 @@ class ProjectFileServiceTest {
 
     @Test
     fun `unlinkFile - should unlink file from project`() {
-        // Arrange
         val projectId = 1L
         val fileId = 2L
         
@@ -445,14 +417,11 @@ class ProjectFileServiceTest {
             file = file
         )
         
-        // Настраиваем моки
         doNothing().`when`(projectService).checkAccessToProject(eq(projectId), eq(mockUser.id), anyList())
         `when`(projectFileRepository.findByProject_IdAndFile_Id(projectId, fileId)).thenReturn(projectFile)
         
-        // Act
         projectFileService.unlinkFile(projectId, fileId)
         
-        // Assert
         verify(projectService).checkAccessToProject(eq(projectId), eq(mockUser.id), anyList())
         verify(projectFileRepository).findByProject_IdAndFile_Id(projectId, fileId)
         verify(projectFileRepository).delete(projectFile)
@@ -460,15 +429,12 @@ class ProjectFileServiceTest {
 
     @Test
     fun `unlinkFile - when file not linked - should throw not found exception`() {
-        // Arrange
         val projectId = 1L
         val fileId = 2L
         
-        // Настраиваем моки
         doNothing().`when`(projectService).checkAccessToProject(eq(projectId), eq(mockUser.id), anyList())
         `when`(projectFileRepository.findByProject_IdAndFile_Id(projectId, fileId)).thenReturn(null)
         
-        // Act & Assert
         val exception = assertFailsWith<ResponseStatusException> {
             projectFileService.unlinkFile(projectId, fileId)
         }
@@ -479,5 +445,59 @@ class ProjectFileServiceTest {
         verify(projectService).checkAccessToProject(eq(projectId), eq(mockUser.id), anyList())
         verify(projectFileRepository).findByProject_IdAndFile_Id(projectId, fileId)
         verify(projectFileRepository, never()).delete(any(ProjectFile::class.java))
+    }
+
+    @Test
+    fun `getFileDetailsInProject - should return file details for given project and file`() {
+        val projectId = 1L
+        val fileId = 2L
+
+        val fileType = FileType(
+            id = 1L,
+            name = "document"
+        )
+
+        val file = File(
+            id = fileId,
+            name = "File Detail",
+            type = fileType,
+            authorId = mockUser.id,
+            uploadDate = LocalDateTime.now()
+        )
+
+        val project = Project(
+            id = projectId,
+            name = "Test Project",
+            description = "Test Description"
+        )
+
+        val projectFile = ProjectFile(
+            id = 1L,
+            project = project,
+            file = file
+        )
+
+        val expectedResponse = ProjectFileResponseDto(
+            id = file.id,
+            name = file.name,
+            type = FileTypeResponseDto(fileType.id, fileType.name),
+            authorId = file.authorId,
+            date = file.uploadDate.toString(),
+            superObjectId = "abc123"
+        )
+
+        doNothing().`when`(projectService).checkAccessToProject(eq(projectId), eq(mockUser.id), anyList())
+        `when`(projectFileRepository.findByProject_IdAndFile_Id(projectId, fileId)).thenReturn(projectFile)
+
+        val result = projectFileService.getFileDetailsInProject(projectId, fileId)
+
+        assertNotNull(result)
+        assertEquals(expectedResponse.id, result.id)
+        assertEquals(expectedResponse.name, result.name)
+        assertEquals(expectedResponse.type.name, result.type.name)
+        assertEquals(expectedResponse.authorId, result.authorId)
+
+        verify(projectService).checkAccessToProject(eq(projectId), eq(mockUser.id), anyList())
+        verify(projectFileRepository).findByProject_IdAndFile_Id(projectId, fileId)
     }
 }

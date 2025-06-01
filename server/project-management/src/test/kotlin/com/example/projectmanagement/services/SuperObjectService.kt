@@ -31,7 +31,6 @@ class SuperObjectServiceTest {
 
     @Test
     fun `create - when fileId is provided - should save and return super object`() {
-        // Arrange
         val superObject = SuperObject(
             fileId = 1L,
             serviceType = "NOTE",
@@ -47,10 +46,8 @@ class SuperObjectServiceTest {
 
         `when`(superObjectRepository.save(any(SuperObject::class.java))).thenReturn(savedSuperObject)
 
-        // Act
         val result = superObjectService.create(superObject)
 
-        // Assert
         assertNotNull(result)
         assertEquals(savedSuperObject.id, result.id)
         assertEquals(savedSuperObject.fileId, result.fileId)
@@ -62,14 +59,12 @@ class SuperObjectServiceTest {
 
     @Test
     fun `create - when fileId is null - should throw IllegalArgumentException`() {
-        // Arrange
         val superObject = SuperObject(
             fileId = null,
             serviceType = "NOTE",
             name = "Test Super Object"
         )
 
-        // Act & Assert
         val exception = assertFailsWith<IllegalArgumentException> {
             superObjectService.create(superObject)
         }
@@ -80,7 +75,6 @@ class SuperObjectServiceTest {
 
     @Test
     fun `create - when duplicate key exception - should return existing super object`() {
-        // Arrange
         val superObject = SuperObject(
             fileId = 1L,
             serviceType = "NOTE",
@@ -97,10 +91,8 @@ class SuperObjectServiceTest {
         `when`(superObjectRepository.save(any(SuperObject::class.java))).thenThrow(DuplicateKeyException("Duplicate key"))
         `when`(superObjectRepository.findByFileId(1L)).thenReturn(existingSuperObject)
 
-        // Act
         val result = superObjectService.create(superObject)
 
-        // Assert
         assertNotNull(result)
         assertEquals(existingSuperObject.id, result.id)
         assertEquals(existingSuperObject.fileId, result.fileId)
@@ -112,7 +104,6 @@ class SuperObjectServiceTest {
 
     @Test
     fun `getByFileId - when super object exists - should return super object`() {
-        // Arrange
         val fileId = 1L
         val superObject = SuperObject(
             id = "super123",
@@ -123,10 +114,8 @@ class SuperObjectServiceTest {
 
         `when`(superObjectRepository.findByFileId(fileId)).thenReturn(superObject)
 
-        // Act
         val result = superObjectService.getByFileId(fileId)
 
-        // Assert
         assertNotNull(result)
         assertEquals(superObject.id, result?.id)
         assertEquals(superObject.fileId, result?.fileId)
@@ -137,7 +126,6 @@ class SuperObjectServiceTest {
 
     @Test
     fun `getById - when super object exists - should return super object`() {
-        // Arrange
         val superObjectId = "super123"
         val superObject = SuperObject(
             id = superObjectId,
@@ -148,10 +136,8 @@ class SuperObjectServiceTest {
 
         `when`(superObjectRepository.findById(superObjectId)).thenReturn(Optional.of(superObject))
 
-        // Act
         val result = superObjectService.getById(superObjectId)
 
-        // Assert
         assertNotNull(result)
         assertEquals(superObject.id, result.id)
         assertEquals(superObject.fileId, result.fileId)
@@ -162,12 +148,10 @@ class SuperObjectServiceTest {
 
     @Test
     fun `getById - when super object doesn't exist - should throw NoSuchElementException`() {
-        // Arrange
         val superObjectId = "nonexistent"
 
         `when`(superObjectRepository.findById(superObjectId)).thenReturn(Optional.empty())
 
-        // Act & Assert
         val exception = assertFailsWith<NoSuchElementException> {
             superObjectService.getById(superObjectId)
         }
@@ -178,7 +162,6 @@ class SuperObjectServiceTest {
 
     @Test
     fun `update - when super object exists - should update and return super object`() {
-        // Arrange
         val superObjectId = "super123"
         val existingSuperObject = SuperObject(
             id = superObjectId,
@@ -202,10 +185,8 @@ class SuperObjectServiceTest {
         `when`(superObjectRepository.findById(superObjectId)).thenReturn(Optional.of(existingSuperObject))
         `when`(superObjectRepository.save(any(SuperObject::class.java))).thenReturn(updatedSuperObject)
 
-        // Act
         val result = superObjectService.update(superObjectId, updates)
 
-        // Assert
         assertNotNull(result)
         assertEquals(updatedSuperObject.id, result.id)
         assertEquals(updatedSuperObject.fileId, result.fileId)
@@ -218,7 +199,6 @@ class SuperObjectServiceTest {
 
     @Test
     fun `syncDocumentBlocks - should sync blocks and update super object`() {
-        // Arrange
         val superObjectId = "super123"
         val superObject = SuperObject(
             id = superObjectId,
@@ -250,7 +230,7 @@ class SuperObjectServiceTest {
                 data = mapOf("text" to "Updated Paragraph 1")
             ),
             EditorJsBlockDto(
-                id = "block3", // New block
+                id = "block3",
                 type = "header",
                 data = mapOf("text" to "New Header", "level" to 2)
             )
@@ -294,10 +274,8 @@ class SuperObjectServiceTest {
         }
         `when`(superObjectRepository.save(any(SuperObject::class.java))).thenReturn(updatedSuperObject)
 
-        // Act
         val result = superObjectService.syncDocumentBlocks(superObjectId, editorJsBlocks)
 
-        // Assert
         assertNotNull(result)
         assertEquals(updatedSuperObject.id, result.id)
         assertEquals(updatedSuperObject.firstItem, result.firstItem)
@@ -310,19 +288,15 @@ class SuperObjectServiceTest {
 
     @Test
     fun `delete - should delete super object`() {
-        // Arrange
         val superObjectId = "super123"
 
-        // Act
         superObjectService.delete(superObjectId)
 
-        // Assert
         verify(superObjectRepository).deleteById(superObjectId)
     }
 
     @Test
     fun `updateMetadata - when super object exists - should update metadata and return super object`() {
-        // Arrange
         val superObjectId = "super123"
         val existingSuperObject = SuperObject(
             id = superObjectId,
@@ -352,10 +326,8 @@ class SuperObjectServiceTest {
         `when`(superObjectRepository.findById(superObjectId)).thenReturn(Optional.of(existingSuperObject))
         `when`(superObjectRepository.save(any(SuperObject::class.java))).thenReturn(updatedSuperObject)
 
-        // Act
         val result = superObjectService.updateMetadata(superObjectId, updates)
 
-        // Assert
         assertNotNull(result)
         assertEquals(updatedSuperObject.id, result.id)
         assertEquals(updatedSuperObject.name, result.name)
