@@ -2,21 +2,25 @@
 
 \bibliography{biblio}
 \setlist[enumerate]{label=\arabic*)}
+\usepackage{pdfpages}
+\usepackage{tocloft}
 \renewcommand{\labelitemi}{---}
+\captionsetup[table]{justification=centering,singlelinecheck=false}
 \begin{document}
+\includepdf[pages=1]{title-vkr.pdf}
 
-\makethesistitle
-    {Информатика и системы управления} % Название факультета
-    {Программное обеспечение ЭВМ и информационные технологии} % Название кафедры
-    {Программно-алгоритмический комплекс с многоцелевой и масштабируемой архитектурой для совместной работы и управления проектами} % Тема работы
-    {Шматко~К.~М./ИУ7-86Б} % Номер группы/ФИО студента (если авторов несколько, их необходимо разделить запятой)
-    {Никульшин~А.~М.} % ФИО научного руководителя
-    {} % ФИО консультанта (необязательный аргумент; если консультантов несколько, их необходимо разделить запятой)
-    {} % ФИО нормоконтролера
-
+\setcounter{page}{5}
 \include{00-essay}
 
-\maketableofcontents
+% \maketableofcontents
+\cftsetindents{chapter}{\parindent}{12.5mm}
+\cftsetindents{section}{\parindent}{12.5mm}
+\cftsetindents{subsection}{\parindent}{12.5mm}
+\setlength{\cftbeforetoctitleskip}{-22pt}
+\setlength{\cftaftertoctitleskip}{0pt} 
+\renewcommand{\cftaftertoctitle}{\hfill}
+\renewcommand{\contentsname}{\hfill\large СОДЕРЖАНИЕ\hfill}
+\tableofcontents
 
 \include{01-definitions}
 \include{02-abbreviations}

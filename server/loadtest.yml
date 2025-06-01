@@ -1,0 +1,60 @@
+config:
+  target: "http://localhost:8080"
+  phases:
+    - duration: 30   # 30 секунд нагрузки
+      arrivalRate: 200
+  payload:
+    # Можно описать тестовые данные (пользователи и т.д.)
+    # - path: users.csv
+    #   fields: [login, password]
+  defaults:
+    headers:
+      Content-Type: "application/json"
+
+scenarios:
+  - name: "Регистрация и вход пользователя"
+    flow:
+      - post:
+          url: "/users/register"
+          json:
+            name: "Stress"
+            surname: "Test"
+            login: "user_{{ $randomInteger(1, 1000) }}"
+            password: "test"
+      - post:
+          url: "/users/login"
+          json:
+            login: "user_1"
+            password: "test"
+          capture:
+            - json: "$.token"
+              as: "token"
+      - think: 1
+
+  - name: "Создание и получение заметки"
+    flow:
+      - post:
+          url: "/super-objects"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            fileId: "{{ $randomInteger(1000, 2000) }}"
+            serviceType: "note"
+            name: "ArtilleryNote"
+      - get:
+          url: "/super-objects/by-file/{{ $randomInteger(1000, 2000) }}"
+          headers:
+            Authorization: "Bearer {{ token }}"
+      - think: 1
+
+  - name: "Создание блока контента"
+    flow:
+      - post:
+          url: "/content-blocks"
+          headers:
+            Authorization: "Bearer {{ token }}"
+          json:
+            id: "block_{{ $randomInteger(10000, 20000) }}"
+            objectType: "paragraph"
+            data: { "text": "Текстовый блок {{ $randomInteger(1, 10000) }}" }
+      - think: 0.5

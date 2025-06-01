@@ -19,26 +19,26 @@
 \RequirePackage{listings}
 \RequirePackage{listingsutf8}
 \lstset{
-	inputencoding=utf8/koi8-r,
-	basicstyle=\small\ttfamily,
-	rulecolor=\color{black},
-	escapeinside={\%*}{*)},
-	breaklines=true,
-	breakatwhitespace=true,
-	tabsize=4,
-	showstringspaces=false,
-	float=h!,
-	abovecaptionskip=-5pt,
+ inputencoding=utf8/koi8-r,
+ basicstyle=\small\ttfamily,
+ rulecolor=\color{black},
+ escapeinside={\%*}{*)},
+ breaklines=true,
+ breakatwhitespace=true,
+ tabsize=4,
+ showstringspaces=false,
+ float=h!,
+ abovecaptionskip=-5pt,
 }
 
 % Команда создания простого листинга
 \newcommand{\includelisting}[2]
 {
-	\lstinputlisting[
-		frame=single,
-		caption={#2},
-		label={lst:#1},
-	]{inc/lst/#1}
+ \lstinputlisting[
+  frame=single,
+  caption={#2},
+  label={lst:#1},
+ ]{inc/lst/#1}
 }
 
 \definecolor{numbers}{rgb}{0.5, 0.5, 0.5}
@@ -49,15 +49,15 @@
 % Команда создания листинга с подсветкой синтаксиса и нумерацией строк
 \newcommand{\includelistingpretty}[3]
 {
-	\lstinputlisting[
-		language={#2},
-		keywordstyle=\color{keywords},
-		stringstyle=\color{strings},
-		commentstyle=\color{comments},
-		frame=leftline,
-		numbers=left,
-		numberstyle=\footnotesize\color{numbers},
-		caption={#3},
-		label={lst:#1},
-	]{inc/lst/#1}
+ \lstinputlisting[
+  language={#2},
+  keywordstyle=\color{keywords},
+  stringstyle=\color{strings},
+  commentstyle=\color{comments},
+  frame=leftline,
+  numbers=left,
+  numberstyle=\footnotesize\color{numbers},
+  caption={#3},
+  label={lst:#1},
+ ]{inc/lst/#1}
 }

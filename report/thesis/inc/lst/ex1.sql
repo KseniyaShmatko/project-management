@@ -4,5 +4,4 @@ CREATE TABLE users (
     login VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     photo_url VARCHAR(255),
-    -- Дополнительные поля
 );

@@ -12,7 +12,6 @@ data class JwtResponse(
     val name: String?,
     val surname: String?,
     val photo: String?
-    // Можно добавить роли, если они есть
 )
 
 data class RegisterRequest(

@@ -92,7 +92,7 @@ const MainArea: React.FC<MainAreaProps> = ({
         <div className="main-area main-area--empty">
             <Text variant="header-1" className="main-area__placeholder-title">Выберите или создайте проект</Text>
             <Text variant="body-1" color="secondary">
-            Чтобы начать работу, выберите проект из списка слева или создайте новый.
+              Чтобы начать работу, выберите проект из списка слева или создайте новый.
             </Text>
         </div>
         );

@@ -27,6 +27,8 @@
 \RequirePackage[utf8]{inputenc}
 \RequirePackage[english,main=russian]{babel}
 \RequirePackage{fix-cm}
+\RequirePackage{pdfpages}
+
 
 % Настройка полей
 \RequirePackage[
@@ -53,13 +55,14 @@
 \renewcommand\LARGE{\@setfontsize\LARGE{22pt}{20}}
 \renewcommand\Large{\@setfontsize\Large{20pt}{20}}
 \renewcommand\large{\@setfontsize\large{16pt}{20}}
+\newcommand\medium{\@setfontsize\medium{14pt}{20}}
 \makeatother
 \RequirePackage{titlesec}
 \titleformat{\chapter}[block]{\hspace{\parindent}\large\bfseries}{\thechapter}{0.5em}{\large\bfseries\raggedright}
 \titleformat{name=\chapter,numberless}[block]{\hspace{\parindent}}{}{0pt}{\large\bfseries\centering}
 \titleformat{\section}[block]{\hspace{\parindent}\large\bfseries}{\thesection}{0.5em}{\large\bfseries\raggedright}
 \titleformat{\subsection}[block]{\hspace{\parindent}\large\bfseries}{\thesubsection}{0.5em}{\large\bfseries\raggedright}
-\titleformat{\subsubsection}[block]{\hspace{\parindent}\large\bfseries}{\thesubsection}{0.5em}{\large\bfseries\raggedright}
+\titleformat{\subsubsection}[block]{\hspace{\parindent}\medium\bfseries}{\thesubsubsection}{0.5em}{\medium\bfseries\raggedright}
 \titlespacing{\chapter}{12.5mm}{-22pt}{10pt}
 \titlespacing{\section}{12.5mm}{10pt}{10pt}
 \titlespacing{\subsection}{12.5mm}{10pt}{10pt}
@@ -99,6 +102,7 @@
     sorting=none,
 ]{biblatex}
 \RequirePackage{csquotes}
+\DeclareDelimFormat{multicitedelim}{\addcomma\space} % Задаёт запятую с пробелом
 \DeclareFieldFormat{urldate}{(дата обращения:\addspace\thefield{urlday}\adddot \thefield{urlmonth}\adddot\thefield{urlyear})}
 
 % Подключение пакета гиперссылок

@@ -10,10 +10,6 @@ import { StyleInlineTool } from 'editorjs-style';
 import ImageTool from '@editorjs/image'
 import Quote from '@editorjs/quote';
 import CodeTool from '@editorjs/code';
-import Table from '@editorjs/table';  
-import Embed from '@editorjs/embed';
-
-import { editorJsRussianLocale } from '../../../shared/i18n/editorjs-ru';
 
 interface EditorTools {
     [toolName: string]: BlockToolConstructable | ToolSettings;

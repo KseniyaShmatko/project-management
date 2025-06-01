@@ -23,8 +23,7 @@
                   reader.onloadend = () => {
                     resolve({
                       success: 1,
-                      file: { url: reader.result as string },
-                    });
+                      file: { url: reader.result as string },});
                   };
                   reader.onerror = reject;
                   reader.readAsDataURL(file);
