@@ -21,6 +21,12 @@ interface ProjectAccessModalProps {
   currentUserId: number;
 }
 
+const roleTranslations: Record<ProjectRole, string> = {
+  [ProjectRole.OWNER]: "Владелец",
+  [ProjectRole.EDITOR]: "Редактор",
+  [ProjectRole.VIEWER]: "Наблюдатель"
+};
+
 const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
   isOpen,
   onClose,
@@ -173,14 +179,14 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
       />
       <div className="project-access-modal__role-controls">
         {project?.owner?.id === participant.userId ? (
-          <Text className="project-access-modal__owner-role" color="positive">{participant.role === ProjectRole.OWNER ? "Владелец" : participant.role}</Text>
+          <Text className="project-access-modal__owner-role" color="positive">{participant.role === ProjectRole.OWNER ? roleTranslations[ProjectRole.OWNER] : roleTranslations[participant.role]}</Text>
         ) : (
           <Select
             value={[participant.role]}
             onUpdate={(value) => handleRoleChange(participant.userId, value[0] as ProjectRole)}
             options={Object.values(ProjectRole)
                 .filter(role => role !== ProjectRole.OWNER)
-                .map(role => ({ value: role, content: role }))
+                .map(role => ({ value: role, content: roleTranslations[role] }))
             }
             size="s"
             disabled={currentUserId !== project?.owner?.id}
@@ -222,52 +228,56 @@ const ProjectAccessModal: React.FC<ProjectAccessModalProps> = ({
       {canManageParticipants && (
         <div className="project-access-modal__add-participant-section">
           <Text variant="subheader-1" className="project-access-modal__add-title">Добавить участника:</Text>
-          <Select
-            filterable
-            value={valueForSelect}
-            onUpdate={(newValues) => {
-                const login = newValues[0];
-                const user = searchedUsers.find(u => u.login === login);
-                setSelectedUser(user || null);
-            }}
-            onFilterChange={setSearchQuery}
-            renderOption={(option) => (
-                <User
-                    name={`${option.data?.name || ''} ${option.data?.surname || ''}`.trim()}
-                    description={option.data?.login}
-                />
-            )}
-            renderSelectedOption={(option) => {
-                return <span>{option.value}</span>;
-            }}
-            options={searchedUsers.map(u => ({ 
-                value: u.login, 
-                content: `${u.name} ${u.surname} (${u.login})`, 
-                data: u 
-            }))}
-            placeholder="Начните вводить логин для поиска..."
-            loading={isLoadingSearch}
-            className="project-access-modal__user-select"
-        />
-          <Select
-            value={[selectedRole]}
-            onUpdate={(value) => setSelectedRole(value[0] as ProjectRole)}
-            options={Object.values(ProjectRole)
-                .filter(role => role !== ProjectRole.OWNER)
-                .map(role => ({ value: role, content: role }))
-            }
-            className="project-access-modal__role-select-new"
-            disabled={!selectedUser}
-          />
-          <Button 
-            onClick={handleAddParticipant} 
-            view="action" 
-            loading={isSubmitting} 
-            disabled={!selectedUser || isSubmitting}
-            className="project-access-modal__add-button"
-          >
-            <Icon data={PersonPlus} /> Добавить
-          </Button>
+          <div className="project-access-modal__group">
+            <div>
+              <Select
+                filterable
+                value={valueForSelect}
+                onUpdate={(newValues) => {
+                    const login = newValues[0];
+                    const user = searchedUsers.find(u => u.login === login);
+                    setSelectedUser(user || null);
+                }}
+                onFilterChange={setSearchQuery}
+                renderOption={(option) => (
+                    <User
+                        name={`${option.data?.name || ''} ${option.data?.surname || ''}`.trim()}
+                        description={option.data?.login}
+                    />
+                )}
+                renderSelectedOption={(option) => {
+                    return <span>{option.value}</span>;
+                }}
+                options={searchedUsers.map(u => ({ 
+                    value: u.login, 
+                    content: `${u.name} ${u.surname} (${u.login})`, 
+                    data: u 
+                }))}
+                placeholder="Введите логин для поиска"
+                loading={isLoadingSearch}
+                className="project-access-modal__user-select"
+              />
+              <Select
+                value={[selectedRole]}
+                onUpdate={(value) => setSelectedRole(value[0] as ProjectRole)}
+                options={Object.values(ProjectRole)
+                  .filter(role => role !== ProjectRole.OWNER)
+                  .map(role => ({ value: role, content: roleTranslations[role] }))
+                }
+                className="project-access-modal__role-select-new"
+                disabled={!selectedUser}
+              />
+            </div>
+            <Button 
+              onClick={handleAddParticipant} 
+              view="action" 
+              loading={isSubmitting} 
+              disabled={!selectedUser || isSubmitting}
+              className="project-access-modal__add-button"
+            >
+              <Icon data={PersonPlus} /> Добавить
+            </Button>
+          </div>
           {error && <Text color="danger" className="project-access-modal__error-text">{error}</Text>}
         </div>
       )}

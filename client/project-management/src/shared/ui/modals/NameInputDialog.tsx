@@ -20,7 +20,7 @@ const fileTypeTranslations: Record<string, string> = {
   'note': 'Заметка',
   'scheme': 'Схема',
   'presentation': 'Презентация',
-  'mindmap': 'mind map',
+  'mindmap': 'Mind-map',
   'chat': 'Чат',
   'calendar': 'Календарь',
   'tracker': 'Трекер',

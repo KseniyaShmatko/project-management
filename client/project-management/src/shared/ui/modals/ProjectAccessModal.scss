@@ -1,9 +1,10 @@
 .project-access-modal-content {
-  width: 600px;
+  width: 560px;
+  height: auto !important;
   display: flex;
   flex-direction: column;
-  gap: var(--g-spacing-4);
-  padding: 20px;
+  gap: var(--g-spacing-5);
+  padding: 26px;
 }
   
 .project-access-modal__header,
@@ -38,8 +39,9 @@
 }
   
 .project-access-modal__role-controls {
-    min-width: 120px;
-    margin-right: var(--g-spacing-2);
+  min-width: 120px;
+  margin-right: var(--g-spacing-2);
+  text-align: end;
 }
   
 .project-access-modal__add-participant-section {
@@ -66,4 +68,23 @@
 .project-access-modal__footer {
   justify-content: flex-end;
   flex-direction: row;
+}
+
+.project-access-modal__add-button {
+  justify-self: start;
+  align-self: flex-end;
+}
+
+.project-access-modal__group {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.project-access-modal__footer {
+  margin-top: 30px;
+}
+
+.project-access-modal__role-select-new {
+  margin-left: 6px;
 }
