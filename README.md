@@ -4,4 +4,4 @@
 
 #### Запуск 
 
-Как запустить бэкенд и фронт написано в diploma/server/project-management/README.md и diploma/client/project-management/README.md
+Как запустить бэкенд и фронт написано в server/project-management/README.md и client/project-management/README.md
